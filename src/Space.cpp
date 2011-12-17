@@ -82,6 +82,7 @@ void Space::Draw()
     const Vec2i offset = -cam;
     Tree::ClearWindow( Tree::Color( 0xFF000000 ) );
 
+    // Draw the chunk we're at
     Chunks::iterator it = chunks.find( CurrentChunkIndex() );
     if( it != chunks.end() ) {
         Chunk &chunk = it->second;
@@ -90,23 +91,6 @@ void Space::Draw()
     else {
         L_ << "Couldn't find " << CurrentChunkIndex() << " chunk for rendering\n";
     }
-
-    //const sf::IntRect visible_chunk( cam.x, cam.y, Tree::GetWindowWidth(), Tree::GetWindowHeight() );
-
-    //// Draw stars
-    //for( size_t i = 0; i < stars.size(); ++i ) {
-        //Vec2i pos = stars[i].pos + offset;
-
-        //if( !visible_chunk.Contains( pos.x, pos.y ) ) continue;
-
-        //star_spr.SetPosition( pos );
-
-        //Tree::Color col = stars[i].color;
-        //col.a = 0xFF * ( stars[i].power + math::frandom( 0, 0.1 ) );
-        //star_spr.SetColor( col );
-
-        //Tree::Draw( star_spr );
-    //}
 
     // Draw items
     for( Items::iterator it = items.begin(); it != items.end(); ++it ) {

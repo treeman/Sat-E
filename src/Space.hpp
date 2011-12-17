@@ -16,13 +16,6 @@ public:
 private:
     Satellite satellite;
 
-    typedef std::vector<Star> Stars;
-    Stars stars;
-
-    std::vector<double> star_colors;
-
-    sf::Sprite star_spr;
-
     typedef std::vector<boost::shared_ptr<Item> > Items;
     Items items;
 

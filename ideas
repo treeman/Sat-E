@@ -16,7 +16,8 @@ Will want to collect an X number of stuff I think? Because... Hmm... So he can b
 * Directional arrow
 * Endless space
     DONE Not just a window full of space...
-    need to only render what's visible, framerates quickly die
+    DONE need to only render what's visible, framerates quickly die
+    Display and generate neighbouring chunks
 * Epic background display
     Supernovas
     Comets
