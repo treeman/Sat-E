@@ -5,12 +5,7 @@
 #include "Satellite.hpp"
 #include "Junk.hpp"
 #include "Box.hpp"
-
-struct Star {
-    Vec2i pos;
-    float power;
-    Tree::Color color;
-};
+#include "Chunk.hpp"
 
 class Space {
 public:
@@ -23,6 +18,8 @@ private:
 
     typedef std::vector<Star> Stars;
     Stars stars;
+
+    std::vector<double> star_colors;
 
     sf::Sprite star_spr;
 
@@ -38,7 +35,25 @@ private:
 
     void InitJunk();
 
+    // Check space so we're in an initialized zone
+    void UpdateSpaceChunks();
+
     // Allocate space objects inside rect
     void AllocateChunk( sf::IntRect rect );
+
+    // Return the current space chunk we're viewing
+    Vec2i CurrentChunkIndex();
+    sf::IntRect ChunkRect( Vec2i chunk );
+
+    // Chunks we've allocated
+    std::set<Vec2i> existing_chunks;
+    // Chunks collecting all stuff inside them
+    typedef std::map<Vec2i, Chunk> Chunks;
+    Chunks chunks;
+
+    void DrawChunk( Vec2i chunk );
+
+    void CenterCam( Vec2i pos );
+    Vec2i cam;
 };
 

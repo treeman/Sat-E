@@ -33,10 +33,10 @@ void Box::Update( float dt )
     grid.Rotate( TWEAKS->GetNum( "box_rotate" ) * dt );
 }
 
-void Box::Draw()
+void Box::Draw( Vec2i offset )
 {
-    grid.SetPosition( pos );
-    spr.SetPosition( pos );
+    grid.SetPosition( pos + offset );
+    spr.SetPosition( pos + offset );
     if( grid_visible ) Tree::Draw( grid );
     Tree::Draw( spr );
 }

@@ -20,7 +20,7 @@ public:
     void SetPos( Vec2f p ) { pos = p; }
 
     virtual void Update( float dt );
-    virtual void Draw() = 0;
+    virtual void Draw( Vec2i offset ) = 0;
 protected:
     void UpdateMovement( float dt );
 

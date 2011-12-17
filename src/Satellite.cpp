@@ -40,12 +40,12 @@ void Satellite::Update( float dt )
     main.Rotate( degree * dt );
 }
 
-void Satellite::Draw()
+void Satellite::Draw( Vec2i offset )
 {
-    main.SetPosition( pos );
+    main.SetPosition( pos + offset );
     Tree::Draw( main );
 
-    narrative.SetPos( pos );
+    narrative.SetPos( pos + offset );
     narrative.Draw();
 }
 

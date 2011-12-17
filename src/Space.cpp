@@ -3,15 +3,13 @@
 Space::Space()
 {
     SETTINGS->Register( "bounding_box_show", false );
+    SETTINGS->Register( "chunk_count", false );
+    SETTINGS->Register( "show_pos", false );
 
-    // Init star resource
-    star_spr = BUTLER->CreateSprite( "gfx/star.png" );
-
-    std::vector<double> colors;
-    colors.push_back( TWEAKS->GetNum( "star_col1" ) );
-    colors.push_back( TWEAKS->GetNum( "star_col2" ) );
-    colors.push_back( TWEAKS->GetNum( "star_col3" ) );
-    colors.push_back( TWEAKS->GetNum( "star_col4" ) );
+    star_colors.push_back( TWEAKS->GetNum( "star_col1" ) );
+    star_colors.push_back( TWEAKS->GetNum( "star_col2" ) );
+    star_colors.push_back( TWEAKS->GetNum( "star_col3" ) );
+    star_colors.push_back( TWEAKS->GetNum( "star_col4" ) );
 
     // 'Random' positions
     for( int x = 0; x < 100; ++x ) {
@@ -24,7 +22,7 @@ Space::Space()
     InitJunk();
 
     // Add in stuff to our window screen
-    AllocateChunk( sf::IntRect( 0, 0, Tree::GetWindowWidth(), Tree::GetWindowHeight() ) );
+    //AllocateChunk( sf::IntRect( 0, 0, Tree::GetWindowWidth(), Tree::GetWindowHeight() ) );
 }
 
 void Space::Update( float dt )
@@ -65,38 +63,60 @@ void Space::Update( float dt )
         box.IsClose( false );
     }
 
-    for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
-        (*it)->Update( dt );
-        if( (*it)->BoundingBox().Intersects( satellite.BoundingBox() ) ) {
-            L_ << "Intersecting!\n";
-        }
-    }
+    //for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
+        //(*it)->Update( dt );
+        //if( (*it)->BoundingBox().Intersects( satellite.BoundingBox() ) ) {
+            //L_ << "Intersecting!\n";
+        //}
+    //}
+
+    // Update chunks, allocate more if needed
+    UpdateSpaceChunks();
+
+    // Center cam on satellite
+    CenterCam( satellite.GetPos() );
 }
 
 void Space::Draw()
 {
+    const Vec2i offset = -cam;
     Tree::ClearWindow( Tree::Color( 0xFF000000 ) );
 
-    // Draw stars
-    for( size_t i = 0; i < stars.size(); ++i ) {
-        star_spr.SetPosition( stars[i].pos );
-
-        Tree::Color col = stars[i].color;
-        col.a = 0xFF * ( stars[i].power + math::frandom( 0, 0.1 ) );
-        star_spr.SetColor( col );
-
-        Tree::Draw( star_spr );
+    Chunks::iterator it = chunks.find( CurrentChunkIndex() );
+    if( it != chunks.end() ) {
+        Chunk &chunk = it->second;
+        chunk.Draw( offset );
+    }
+    else {
+        L_ << "Couldn't find " << CurrentChunkIndex() << " chunk for rendering\n";
     }
 
-    // Draw pickups
+    //const sf::IntRect visible_chunk( cam.x, cam.y, Tree::GetWindowWidth(), Tree::GetWindowHeight() );
+
+    //// Draw stars
+    //for( size_t i = 0; i < stars.size(); ++i ) {
+        //Vec2i pos = stars[i].pos + offset;
+
+        //if( !visible_chunk.Contains( pos.x, pos.y ) ) continue;
+
+        //star_spr.SetPosition( pos );
+
+        //Tree::Color col = stars[i].color;
+        //col.a = 0xFF * ( stars[i].power + math::frandom( 0, 0.1 ) );
+        //star_spr.SetColor( col );
+
+        //Tree::Draw( star_spr );
+    //}
+
+    // Draw items
     for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
-        (*it)->Draw();
+        (*it)->Draw( offset );
     }
 
-    box.Draw();
+    box.Draw( offset );
 
     // Draw satellite
-    satellite.Draw();
+    satellite.Draw( offset );
 
     if( SETTINGS->GetValue<bool>( "bounding_box_show" ) ) {
         DrawOutline( satellite.BoundingBox() );
@@ -114,6 +134,8 @@ void Space::DrawOutline( sf::IntRect box )
         Tree::Color( 0xFFFFFFFF ), 1.0, Tree::Color( 0xFFFFFFFF ) );
     border.EnableFill( false );
     border.EnableOutline( true );
+
+    border.Move( -cam );
 
     Tree::Draw( border );
 }
@@ -148,32 +170,60 @@ void Space::InitJunk()
     }
 }
 
-void Space::AllocateChunk( sf::IntRect rect )
+void Space::UpdateSpaceChunks()
 {
-    L_( "making space for %d,%d - %d,%d\n", rect.Left, rect.Top, rect.Right, rect.Bottom );
+    const Vec2i chunk_index = CurrentChunkIndex();
 
-    float area = std::abs( rect.Left - rect.Right ) * std::abs( rect.Top - rect.Bottom );
-
-    const int num_stars = area / 100;
-
-    L_( "area %f => %d stars\n", area, num_stars );
-
-    // Set some stars
-    for( size_t i = 0; i < num_stars; ++i ) {
-        Star star;
-        star.pos = Vec2i( math::irandom( rect.Left, rect.Right ), math::irandom( rect.Top, rect.Bottom ) );
-        star.power = math::frandom( 0, 0.4 );
-
-        star.color = Tree::Color( *math::random( colors.begin(), colors.end() ) );
-
-        stars.push_back( star );
+    if( SETTINGS->GetValue<bool>( "show_pos" ) ) {
+        std::stringstream ss;
+        Vec2i ip = satellite.GetPos();
+        ss << "pos: " << ip << " in chunk " << chunk_index << '\n';
+        Tree::VisualDebug( ss.str() );
     }
 
-    // Add in some junk on screen
-    for( int i = 0; i < 10; ++i ) {
-        boost::shared_ptr<Item> item( new Junk( junk_bag.Get() ) );
-        item->SetPos( position_bag.Get() );
-        items.push_back( item );
+    // Not yet allocated
+    if( existing_chunks.find( chunk_index ) == existing_chunks.end() ) {
+        // Make a chunk!
+        Chunk chunk( ChunkRect( chunk_index ) );
+        // Insert it
+        chunks.insert( std::make_pair( chunk_index, chunk ) );
+        existing_chunks.insert( chunk_index );
     }
+
+    if( SETTINGS->GetValue<bool>( "chunk_count" ) ) {
+        std::stringstream ss;
+        ss << chunks.size() << " chunks\n";
+        Tree::VisualDebug( ss.str() );
+    }
+}
+
+// Where are we?
+Vec2i Space::CurrentChunkIndex()
+{
+    const Vec2i center = satellite.GetPos();
+    const int chunk_size = TWEAKS->GetNum( "space_chunk" );
+    Vec2i chunk( center.x / chunk_size, center.y / chunk_size );
+
+    // One off if we're going the 'wrong' direction
+    if( center.x < 0 ) chunk -= Vec2i( 1, 0 );
+    if( center.y < 0 ) chunk -= Vec2i( 0, 1 );
+
+    return chunk;
+}
+
+sf::IntRect Space::ChunkRect( Vec2i chunk )
+{
+    const int chunk_size = TWEAKS->GetNum( "space_chunk" );
+    const Vec2i topleft = chunk * 1000;
+    return sf::IntRect( topleft.x, topleft.y, topleft.x + chunk_size, topleft.y + chunk_size );
+}
+
+void Space::CenterCam( Vec2i pos )
+{
+    const int w = Tree::GetWindowWidth();
+    const int h = Tree::GetWindowHeight();
+
+    cam.x = pos.x - w / 2;
+    cam.y = pos.y - h / 2;
 }
 

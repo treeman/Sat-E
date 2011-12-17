@@ -9,7 +9,7 @@ public:
     sf::IntRect BoundingBox();
 
     void Update( float dt );
-    void Draw();
+    void Draw( Vec2i offset );
 private:
     sf::Sprite spr;
 };

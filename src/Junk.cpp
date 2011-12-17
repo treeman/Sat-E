@@ -14,9 +14,9 @@ void Junk::Update( float dt )
     spr.Rotate( TWEAKS->GetNum( "junk_rotate" ) * dt );
 }
 
-void Junk::Draw()
+void Junk::Draw( Vec2i offset )
 {
-    spr.SetPosition( pos );
+    spr.SetPosition( pos + offset );
     Tree::Draw( spr );
 }
 
