@@ -3,7 +3,7 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Satellite.hpp"
-#include "Powerup.hpp"
+#include "Junk.hpp"
 #include "Box.hpp"
 
 struct Star {
@@ -26,11 +26,16 @@ private:
 
     sf::Sprite star_spr;
 
-    typedef std::vector<boost::shared_ptr<Pickup> > Pickups;
-    Pickups pickups;
+    typedef std::vector<boost::shared_ptr<Item> > Items;
+    Items items;
 
     void DrawOutline( sf::IntRect box );
 
     Box box;
+
+    Tree::ShuffleBag<sf::Sprite> junk_bag;
+    Tree::ShuffleBag<Vec2i> position_bag;
+
+    void InitJunk();
 };
 

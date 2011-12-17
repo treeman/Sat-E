@@ -13,7 +13,7 @@ Satellite::Satellite()
 
 sf::IntRect Satellite::BoundingBox()
 {
-    return sf::IntRect( pos.x, pos.y, pos.x + 10, pos.y + 10 );
+    return sf::IntRect( pos.x -5, pos.y -5, pos.x + 5, pos.y + 5 );
 }
 
 float Satellite::MaxVel()

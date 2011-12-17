@@ -1,0 +1,22 @@
+#include "Junk.hpp"
+
+Junk::Junk( sf::Sprite _spr ) : spr(_spr)
+{
+}
+
+sf::IntRect Junk::BoundingBox()
+{
+    return sf::IntRect( pos.x -5, pos.y -5, pos.x + 5, pos.y + 5 );
+}
+
+void Junk::Update( float dt )
+{
+    spr.Rotate( TWEAKS->GetNum( "junk_rotate" ) * dt );
+}
+
+void Junk::Draw()
+{
+    spr.SetPosition( pos );
+    Tree::Draw( spr );
+}
+

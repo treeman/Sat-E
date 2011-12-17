@@ -1,10 +1,14 @@
 #include "Box.hpp"
 
-Box::Box()
+Box::Box() : grid_visible( false )
 {
     pos = Vec2f( 400, 300 );
     spr = BUTLER->CreateSprite( "box" );
     spr.SetCenter( 10, 10 );
+
+    grid = BUTLER->CreateSprite( "gfx/grid.png" );
+    grid.SetCenter( 28, 28 );
+    grid.SetColor( Tree::Color( 0x66189E13 ) );
 }
 
 sf::IntRect Box::BoundingBox()
@@ -17,15 +21,23 @@ float Box::MaxVel()
     return 0;
 }
 
+void Box::IsClose( bool b )
+{
+    grid_visible = b;
+}
+
 void Box::Update( float dt )
 {
     UpdateMovement( dt );
     spr.Rotate( TWEAKS->GetNum( "box_rotate" ) * dt );
+    grid.Rotate( TWEAKS->GetNum( "box_rotate" ) * dt );
 }
 
 void Box::Draw()
 {
+    grid.SetPosition( pos );
     spr.SetPosition( pos );
+    if( grid_visible ) Tree::Draw( grid );
     Tree::Draw( spr );
 }
 

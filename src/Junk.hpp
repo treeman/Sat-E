@@ -1,23 +1,16 @@
 #pragma once
 
-#include "Tree.hpp"
 #include "Item.hpp"
 
-class Box : public Item {
+class Junk : public Item {
 public:
-    Box();
+    Junk( sf::Sprite spr );
 
     sf::IntRect BoundingBox();
-
-    float MaxVel();
-
-    void IsClose( bool b );
 
     void Update( float dt );
     void Draw();
 private:
     sf::Sprite spr;
-    sf::Sprite grid;
-    bool grid_visible;
 };
 

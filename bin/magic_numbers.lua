@@ -14,3 +14,5 @@ star_col4 = 0x8EEB00
 
 box_rotate = 10
 
+junk_rotate = 15
+

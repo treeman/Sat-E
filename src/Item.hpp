@@ -11,7 +11,13 @@ public:
     void Accelerate( Vec2f acc );
 
     // Set speed
-    virtual float MaxVel() = 0;
+    virtual float MaxVel() { return 0; }
+
+    const Vec2f GetPos() { return pos; }
+    const Vec2f GetVel() { return vel; }
+    const Vec2f GetAcc() { return acc; }
+
+    void SetPos( Vec2f p ) { pos = p; }
 
     virtual void Update( float dt );
     virtual void Draw() = 0;
