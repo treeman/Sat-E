@@ -1,13 +1,11 @@
 #pragma once
 
 #include "Tree.hpp"
-
 #include "Item.hpp"
-#include "Narrative.hpp"
 
-class Satellite : public Item {
+class Box : public Item {
 public:
-    Satellite();
+    Box();
 
     sf::IntRect BoundingBox();
 
@@ -16,10 +14,6 @@ public:
     void Update( float dt );
     void Draw();
 private:
-    sf::Sprite main;
-
-    sf::Sound move_snd;
-
-    Narrative narrative;
+    sf::Sprite spr;
 };
 

@@ -4,27 +4,50 @@
 
 class Line {
 public:
-    Line( std::string str, float alive );
+    Line( std::string str, float alive, float pause_before );
+
+    void Start();
 
     bool IsDone();
 
-    void DrawAt( Vec2i pos );
+    const std::string Str();
 private:
     std::string str;
     Tree::Timer t;
-    float alive_time;
+    float alive_time, pause_before;
+};
 
-    sf::String r_str;
+class Talk {
+public:
+    Talk();
+
+    void Start();
+
+    bool IsDone();
+    void Push( std::string, float alive, float pause_before );
+
+    std::string Get();
+private:
+    typedef std::vector<Line> Lines;
+    Lines lines;
+
+    void Update();
 };
 
 class Narrative {
 public:
     Narrative();
 
-    void SetPos( Vec2f pos );
+    void SetPos( Vec2i pos );
 
     void Draw();
 private:
-    Vec2f pos;
+    Vec2i pos;
+
+    void ParseFile( std::string file );
+
+    sf::String r_str;
+
+    Talk talk;
 };
 

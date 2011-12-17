@@ -4,6 +4,7 @@
 
 #include "Satellite.hpp"
 #include "Powerup.hpp"
+#include "Box.hpp"
 
 struct Star {
     Vec2i pos;
@@ -29,5 +30,7 @@ private:
     Pickups pickups;
 
     void DrawOutline( sf::IntRect box );
+
+    Box box;
 };
 

@@ -31,6 +31,8 @@ void Space::Update( float dt )
 {
     satellite.Update( dt );
 
+    box.Update( dt );
+
     const sf::Input &input = GAME->GetInput();
 
     // Update movements for the satellite in a fluid manner
@@ -72,7 +74,7 @@ void Space::Draw()
         star_spr.SetPosition( stars[i].pos );
 
         Tree::Color col = stars[i].color;
-        col.a = 0xFF * stars[i].power;
+        col.a = 0xFF * ( stars[i].power + math::frandom( 0, 0.1 ) );
         star_spr.SetColor( col );
 
         Tree::Draw( star_spr );
@@ -83,6 +85,7 @@ void Space::Draw()
         (*it)->Draw();
     }
 
+    box.Draw();
 
     // Draw satellite
     satellite.Draw();

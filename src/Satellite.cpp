@@ -5,6 +5,8 @@ Satellite::Satellite()
     pos = Vec2f( 100, 100 );
 
     main = BUTLER->CreateSprite( "gfx/basic.png" );
+    main.SetCenter( 5, 5 );
+
     move_snd = BUTLER->CreateSound( "snd/burst1.wav" );
     move_snd.SetLoop( true );
 }
@@ -30,14 +32,29 @@ void Satellite::Update( float dt )
 
     UpdateMovement( dt );
 
-    Vec2f comp( 0, 1 );
-    float angle = atan2( vel.y, vel.x ) - atan2( comp.y, comp.x ) + math::PI;
+    // Rotate a bit
+    float angle = atan2( vel.y, vel.x ) - atan2( acc.y, acc.x ) + math::PI_2;
 
-    float degree = angle * 180 / math::PI;
-    main.SetRotation( degree );
+    float degree = 180 / math::PI * angle;
+
+    if( angle < 0 ) {
+        Tree::VisualDebug( "up" );
+    }
+    else {
+        Tree::VisualDebug( "down" );
+    }
+
+    if( std::abs( angle ) < math::PI_2 ) {
+        Tree::VisualDebug( "right" );
+    }
+    else {
+        Tree::VisualDebug( "left" );
+    }
+
+    main.Rotate( degree * dt );
 
     std::stringstream ss;
-    ss << vel << " => " << degree;
+    ss << vel << " => " << angle;
     Tree::VisualDebug( "angle", ss.str() );
 }
 
@@ -45,5 +62,8 @@ void Satellite::Draw()
 {
     main.SetPosition( pos );
     Tree::Draw( main );
+
+    narrative.SetPos( pos );
+    narrative.Draw();
 }
 
