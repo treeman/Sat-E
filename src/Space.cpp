@@ -4,7 +4,7 @@ Space::Space()
 {
     SETTINGS->Register( "bounding_box_show", false );
 
-    // Init stars
+    // Init star resource
     star_spr = BUTLER->CreateSprite( "gfx/star.png" );
 
     std::vector<double> colors;
@@ -12,18 +12,6 @@ Space::Space()
     colors.push_back( TWEAKS->GetNum( "star_col2" ) );
     colors.push_back( TWEAKS->GetNum( "star_col3" ) );
     colors.push_back( TWEAKS->GetNum( "star_col4" ) );
-
-    for( size_t i = 0; i < 100; ++i ) {
-        Star star;
-        star.pos = Vec2i( math::irandom( 0, 800 ), math::irandom( 0, 600 ) );
-        star.power = math::frandom( 0, 0.4 );
-
-        star.color = Tree::Color( *math::random( colors.begin(), colors.end() ) );
-
-        stars.push_back( star );
-    }
-
-    // Initialize stuff in space w00p
 
     // 'Random' positions
     for( int x = 0; x < 100; ++x ) {
@@ -35,12 +23,8 @@ Space::Space()
     // Setup junk sprites
     InitJunk();
 
-    // Add in some junk on screen
-    for( int i = 0; i < 10; ++i ) {
-        boost::shared_ptr<Item> item( new Junk( junk_bag.Get() ) );
-        item->SetPos( position_bag.Get() );
-        items.push_back( item );
-    }
+    // Add in stuff to our window screen
+    AllocateChunk( sf::IntRect( 0, 0, Tree::GetWindowWidth(), Tree::GetWindowHeight() ) );
 }
 
 void Space::Update( float dt )
@@ -161,6 +145,35 @@ void Space::InitJunk()
         spr.SetCenter( width / 2, height / 2 );
 
         junk_bag.Add( spr );
+    }
+}
+
+void Space::AllocateChunk( sf::IntRect rect )
+{
+    L_( "making space for %d,%d - %d,%d\n", rect.Left, rect.Top, rect.Right, rect.Bottom );
+
+    float area = std::abs( rect.Left - rect.Right ) * std::abs( rect.Top - rect.Bottom );
+
+    const int num_stars = area / 100;
+
+    L_( "area %f => %d stars\n", area, num_stars );
+
+    // Set some stars
+    for( size_t i = 0; i < num_stars; ++i ) {
+        Star star;
+        star.pos = Vec2i( math::irandom( rect.Left, rect.Right ), math::irandom( rect.Top, rect.Bottom ) );
+        star.power = math::frandom( 0, 0.4 );
+
+        star.color = Tree::Color( *math::random( colors.begin(), colors.end() ) );
+
+        stars.push_back( star );
+    }
+
+    // Add in some junk on screen
+    for( int i = 0; i < 10; ++i ) {
+        boost::shared_ptr<Item> item( new Junk( junk_bag.Get() ) );
+        item->SetPos( position_bag.Get() );
+        items.push_back( item );
     }
 }
 

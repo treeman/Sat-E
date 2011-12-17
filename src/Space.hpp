@@ -37,5 +37,8 @@ private:
     Tree::ShuffleBag<Vec2i> position_bag;
 
     void InitJunk();
+
+    // Allocate space objects inside rect
+    void AllocateChunk( sf::IntRect rect );
 };
 
