@@ -4,6 +4,13 @@ Line::Line( std::string _str, float pause, float display ) : str(_str), alive_ti
 {
 }
 
+Line::Line( const Line &line )
+{
+    str = line.str;
+    alive_time = line.alive_time;
+    pause_before = line.pause_before;
+}
+
 void Line::Start()
 {
     t.Start();
@@ -26,7 +33,14 @@ const std::string Line::Str()
 
 Talk::Talk()
 {
+}
 
+Talk::Talk( const Talk &talk )
+{
+    for( size_t i = 0; i < talk.lines.size(); ++i ) {
+        Line line = Line( talk.lines[i] );
+        lines.push_back( line );
+    }
 }
 
 void Talk::Start()
@@ -72,7 +86,15 @@ Narrative::Narrative()
     // Parse file for narratives
     ParseFile( "narrative" );
 
-    talk.Start();
+    // Add in delay between talks
+    delays.Add(10).Add(15).Add(30).Add(40).Add(60).Add(15).Add(100);
+    //delays.Add(1).Add(2).Add(3);
+
+    // Init narrative
+    curr_delay = delays.Get();
+    Update();
+
+    t.Start();
 
     r_str = BUTLER->CreateString( "fnt/arial.ttf", 15 );
 }
@@ -84,8 +106,9 @@ void Narrative::SetPos( Vec2i _pos )
 
 void Narrative::Draw()
 {
-    //r_str.SetText( "pew" );
-    r_str.SetText( talk.Get() );
+    Update();
+
+    r_str.SetText( curr_talk.Get() );
     r_str.SetPosition( pos.x + 5, pos.y - 35 );
     Tree::Draw( r_str );
 }
@@ -99,12 +122,23 @@ void Narrative::ParseFile( std::string file )
         throw( Tree::resource_not_found( s.c_str() ) );
     }
 
+    Talk talk;
+
     while( !in.eof() )
     {
         std::string str;
         std::getline( in, str );
 
-        if( str.size() == 0 ) continue;
+        // Continue to next talk at newline
+        if( str.size() == 0 ) {
+            // If we have anything then insert
+            if( !talk.IsDone() ) {
+                //talks.push_back( talk );
+                talks.Add( talk );
+            }
+            talk = Talk();
+            continue;
+        }
 
         // split string into
         // <pause_before> <display_time> <text...>
@@ -122,8 +156,22 @@ void Narrative::ParseFile( std::string file )
         const int pause_time = boost::lexical_cast<int>( pause );
         const int display_time = boost::lexical_cast<int>( display );
 
-        //L_ << "< " << str << '\n';
         talk.Push( str, pause_time, display_time );
+    }
+}
+
+void Narrative::Update()
+{
+    if( curr_talk.IsDone() ) {
+        if( t.GetTime() > curr_delay ) {
+            curr_talk = Talk( talks.Get() );
+            curr_delay = delays.Get();
+            t.Stop();
+            curr_talk.Start();
+        }
+        else if( !t.IsStarted() ) {
+            t.Start();
+        }
     }
 }
 

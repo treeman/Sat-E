@@ -1,6 +1,6 @@
 -- random magic numbers
 
-font_debug_color = 0xffa70056
+font_debug_color = 0xffffffff
 
 satellite_acc = 600
 satellite_max_vel = 400

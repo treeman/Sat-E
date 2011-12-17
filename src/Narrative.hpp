@@ -5,6 +5,7 @@
 class Line {
 public:
     Line( std::string str, float alive, float pause_before );
+    Line( const Line &line );
 
     void Start();
 
@@ -20,6 +21,7 @@ private:
 class Talk {
 public:
     Talk();
+    Talk( const Talk &talk );
 
     void Start();
 
@@ -48,6 +50,15 @@ private:
 
     sf::String r_str;
 
-    Talk talk;
+    // Better random
+    Tree::ShuffleBag<Talk> talks;
+    Tree::ShuffleBag<int> delays;
+
+    Talk curr_talk;
+    int curr_delay;
+    Tree::Timer t;
+
+    void Update();
+
 };
 

@@ -37,25 +37,7 @@ void Satellite::Update( float dt )
 
     float degree = 180 / math::PI * angle;
 
-    if( angle < 0 ) {
-        Tree::VisualDebug( "up" );
-    }
-    else {
-        Tree::VisualDebug( "down" );
-    }
-
-    if( std::abs( angle ) < math::PI_2 ) {
-        Tree::VisualDebug( "right" );
-    }
-    else {
-        Tree::VisualDebug( "left" );
-    }
-
     main.Rotate( degree * dt );
-
-    std::stringstream ss;
-    ss << vel << " => " << angle;
-    Tree::VisualDebug( "angle", ss.str() );
 }
 
 void Satellite::Draw()
