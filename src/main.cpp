@@ -17,6 +17,10 @@ int main()
             , true            // lazy drawing
         );
 
+        // Initialize shared resources
+        Tree::GetTweaks()->Load( "magic_numbers.lua" );
+        Tree::GetButler()->LoadSprites( "sprites.lua" );
+
         // Push your gamestates here
         {
             boost::shared_ptr<Tree::GameState> state( new Game() );

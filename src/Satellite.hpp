@@ -6,6 +6,8 @@ class Satellite {
 public:
     Satellite();
 
+    sf::IntRect BoundingBox();
+
     void Accelerate( Vec2f acc );
 
     void Update( float dt );
@@ -16,5 +18,7 @@ private:
     Vec2f pos;
     Vec2f vel;
     Vec2f acc;
+
+    sf::Sound move_snd;
 };
 

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Tree.hpp"
-#include "Satellite.hpp"
+#include "Space.hpp"
 
 class Game : public Tree::GameState {
 public:
@@ -12,8 +12,6 @@ public:
     void Update( float dt );
     void Draw();
 private:
-    sf::Sprite background;
-
-    Satellite satellite;
+    Space space;
 };
 
