@@ -6,6 +6,7 @@
 #include "Junk.hpp"
 #include "Box.hpp"
 #include "Chunk.hpp"
+#include "ItemGenerator.hpp"
 
 class Space {
 public:
@@ -16,23 +17,18 @@ public:
 private:
     Satellite satellite;
 
-    typedef std::vector<boost::shared_ptr<Item> > Items;
-    Items items;
+    std::vector<double> star_colors;
 
     void DrawOutline( sf::IntRect box );
 
+    // Our base box ^^
     Box box;
-
-    Tree::ShuffleBag<sf::Sprite> junk_bag;
-    Tree::ShuffleBag<Vec2i> position_bag;
-
-    void InitJunk();
 
     // Check space so we're in an initialized zone
     void UpdateSpaceChunks();
 
     // Allocate space objects inside rect
-    void AllocateChunk( sf::IntRect rect );
+    void AllocateChunk( Vec2i chunk_index );
 
     // Return the current space chunk we're viewing
     Vec2i CurrentChunkIndex();
@@ -48,5 +44,7 @@ private:
 
     void CenterCam( Vec2i pos );
     Vec2i cam;
+
+    ItemGenerator generator;
 };
 

@@ -2,6 +2,11 @@
 
 #include "Tree.hpp"
 
+class Item;
+
+// Lazy zzz
+typedef boost::shared_ptr<Item> ItemPtr;
+
 class Item {
 public:
     virtual ~Item() { }

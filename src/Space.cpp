@@ -1,6 +1,6 @@
 #include "Space.hpp"
 
-Space::Space()
+Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "space_chunk" ) )
 {
     SETTINGS->Register( "bounding_box_show", false );
     SETTINGS->Register( "chunk_count", false );
@@ -10,19 +10,6 @@ Space::Space()
     star_colors.push_back( TWEAKS->GetNum( "star_col2" ) );
     star_colors.push_back( TWEAKS->GetNum( "star_col3" ) );
     star_colors.push_back( TWEAKS->GetNum( "star_col4" ) );
-
-    // 'Random' positions
-    for( int x = 0; x < 100; ++x ) {
-        for( int y = 0; y < 100; ++y ) {
-            position_bag.Add( Vec2i( x * 10, y * 10 ) );
-        }
-    }
-
-    // Setup junk sprites
-    InitJunk();
-
-    // Add in stuff to our window screen
-    //AllocateChunk( sf::IntRect( 0, 0, Tree::GetWindowWidth(), Tree::GetWindowHeight() ) );
 }
 
 void Space::Update( float dt )
@@ -93,9 +80,9 @@ void Space::Draw()
     }
 
     // Draw items
-    for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
-        (*it)->Draw( offset );
-    }
+    //for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
+        //(*it)->Draw( offset );
+    //}
 
     box.Draw( offset );
 
@@ -106,9 +93,9 @@ void Space::Draw()
         DrawOutline( satellite.BoundingBox() );
 
         // Draw outlines for pickups
-        for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
-            DrawOutline( (*it)->BoundingBox() );
-        }
+        //for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
+            //DrawOutline( (*it)->BoundingBox() );
+        //}
     }
 }
 
@@ -124,36 +111,6 @@ void Space::DrawOutline( sf::IntRect box )
     Tree::Draw( border );
 }
 
-void Space::InitJunk()
-{
-    // Get a list of junk
-    Tree::ImgPtr img = BUTLER->GetImage( "gfx/junk.png" );
-
-    const int width = 20;
-    const int height = 20;
-
-    const int num_w = img->GetWidth() / width;
-    const int num_h = img->GetHeight() / height;
-    const int images = num_w * num_h;
-
-    //L_( "%dx%d = %d\n", img->GetWidth(), img->GetHeight(), images );
-
-    for( int i = 0; i < images; ++i ) {
-        const int x_index = i % num_w;
-        const int y_index = i / num_w;
-
-        const int x = x_index * width;
-        const int y = y_index * height;
-
-        sf::Sprite spr;
-        spr.SetImage( *img );
-        spr.SetSubRect( sf::IntRect( x, y, x + width, y + height ) );
-        spr.SetCenter( width / 2, height / 2 );
-
-        junk_bag.Add( spr );
-    }
-}
-
 void Space::UpdateSpaceChunks()
 {
     const Vec2i chunk_index = CurrentChunkIndex();
@@ -167,11 +124,7 @@ void Space::UpdateSpaceChunks()
 
     // Not yet allocated
     if( existing_chunks.find( chunk_index ) == existing_chunks.end() ) {
-        // Make a chunk!
-        Chunk chunk( ChunkRect( chunk_index ) );
-        // Insert it
-        chunks.insert( std::make_pair( chunk_index, chunk ) );
-        existing_chunks.insert( chunk_index );
+        AllocateChunk( chunk_index );
     }
 
     if( SETTINGS->GetValue<bool>( "chunk_count" ) ) {
@@ -179,6 +132,16 @@ void Space::UpdateSpaceChunks()
         ss << chunks.size() << " chunks\n";
         Tree::VisualDebug( ss.str() );
     }
+}
+
+void Space::AllocateChunk( Vec2i chunk_index )
+{
+    // Make a chunk!
+    Chunk chunk( ChunkRect( chunk_index ), generator );
+
+    // Insert it
+    chunks.insert( std::make_pair( chunk_index, chunk ) );
+    existing_chunks.insert( chunk_index );
 }
 
 // Where are we?
