@@ -1,23 +1,20 @@
 #pragma once
 
 #include "Tree.hpp"
+#include "Item.hpp"
 
-class Satellite {
+class Satellite : public Item {
 public:
     Satellite();
 
     sf::IntRect BoundingBox();
 
-    void Accelerate( Vec2f acc );
+    float MaxVel();
 
     void Update( float dt );
     void Draw();
 private:
     sf::Sprite main;
-
-    Vec2f pos;
-    Vec2f vel;
-    Vec2f acc;
 
     sf::Sound move_snd;
 };

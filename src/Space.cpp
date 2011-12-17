@@ -35,18 +35,26 @@ void Space::Update( float dt )
 
     // Update movements for the satellite in a fluid manner
     // Should move to controller or something
+    //
+    Vec2i acc;
+    // Set direction
     if( input.IsKeyDown( sf::Key::Left ) ) {
-        satellite.Accelerate( Vec2f::left );
+        acc += Vec2f::left;
     }
     if( input.IsKeyDown( sf::Key::Right ) ) {
-        satellite.Accelerate( Vec2f::right );
+        acc += Vec2f::right;
     }
     if( input.IsKeyDown( sf::Key::Up ) ) {
-        satellite.Accelerate( Vec2f::up );
+        acc += Vec2f::up;
     }
     if( input.IsKeyDown( sf::Key::Down ) ) {
-        satellite.Accelerate( Vec2f::down );
+        acc += Vec2f::down;
     }
+
+    // Set size
+    acc.SetMagnitude( TWEAKS->GetNum( "satellite_acc" ) );
+
+    satellite.Accelerate( acc );
 
     for( Pickups::iterator it = pickups.begin(); it != pickups.end(); ++it ) {
         if( (*it)->BoundingBox().Intersects( satellite.BoundingBox() ) ) {
