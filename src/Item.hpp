@@ -13,6 +13,7 @@ enum ItemBehavior {
     AddJunk,
     Hurts,
     Heal,
+    AddCovet,
 };
 
 class Item {

@@ -61,7 +61,6 @@ private:
     void DrawLife();
 
     void JunkAdded( int num );
-    int junk_collected;
 
     sf::Sprite junk_spr;
     sf::String junk_str;
@@ -89,5 +88,6 @@ private:
 
     sf::Sound hit_snd;
     sf::Sound heal_snd;
+    sf::Sound coveted_snd;
 };
 

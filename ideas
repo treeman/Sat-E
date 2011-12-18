@@ -29,10 +29,23 @@ DONE * Endless space
 DONE * Upgrades should be reflected on satellite
 * Need more expensive stuff to find and collect
 * More/better further away
+    Tweak chunk types or something?
 * Need to tweak numbers and shit
 * Background music
 * Graphics for docking choices
-* Pickup health
+DONE * Pickup health
+
+# Big TODO
+* Different characteristic for different chunks
+* Victory and End
+DONE * Additional item to collect apart from junk
+* Better visuals on docking
+* Background music (?)
+* Nicer graphics
+
+THEN
+
+* Fine tuning
 
 # Gameplay
 * Collect different stuff

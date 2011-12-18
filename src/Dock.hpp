@@ -19,12 +19,14 @@ enum Action {
 };
 
 struct Selection {
-    Selection() : available(true), count(0) { }
+    Selection() : available(true), count(0), junk_cost(0), coveted_cost(0) { }
 
     bool available;
     Action action;
     int count;
     std::string txt;
+    int junk_cost;
+    int coveted_cost;
 };
 
 class Dock {
@@ -61,5 +63,8 @@ private:
     sf::Sound move_snd;
 
     Satellite &satellite;
+
+    bool MeetsDemand( Selection &s );
+    void RetractDemand( Selection &s );
 };
 

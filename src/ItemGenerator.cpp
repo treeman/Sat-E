@@ -31,6 +31,7 @@ ItemGenerator::ItemGenerator( int ch, int cw ) : chunk_w(cw), chunk_h(ch)
     Fill( junk_bag, "gfx/junk.png", 20, 20 );
     Fill( asteroid_bag, "gfx/asteroids.png", 20, 20 );
     Fill( healer_bag, "gfx/healer.png", 20, 20 );
+    Fill( coveted_bag, "gfx/coveted.png", 20, 20 );
 }
 
 ItemPtr ItemGenerator::CreateJunk( Vec2i offset )
@@ -50,6 +51,13 @@ ItemPtr ItemGenerator::CreateAsteroid( Vec2i offset )
 ItemPtr ItemGenerator::CreateHealer( Vec2i offset )
 {
     ItemPtr item( new Healer( healer_bag.Get() ) );
+    item->SetPos( position_bag.Get() + offset );
+    return item;
+}
+
+ItemPtr ItemGenerator::CreateCoveted( Vec2i offset )
+{
+    ItemPtr item( new Coveted( coveted_bag.Get() ) );
     item->SetPos( position_bag.Get() + offset );
     return item;
 }

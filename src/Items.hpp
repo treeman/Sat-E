@@ -54,3 +54,8 @@ public:
     Healer( sf::Sprite spr ) : SimpleItem( spr, Heal, TWEAKS->GetNum( "junk_rotate" ) ) { }
 };
 
+class Coveted : public SimpleItem {
+public:
+    Coveted( sf::Sprite spr ) : SimpleItem( spr, AddCovet, TWEAKS->GetNum( "junk_rotate" ) ) { }
+};
+

@@ -15,14 +15,32 @@ Dock::Dock( Satellite &sat ) : satellite(sat)
     }
 
     selections[Battery].txt = "I can go further!";
+    selections[Battery].junk_cost = 2;
+
     selections[Acceleration].txt = "Better handling, better controll.";
+    selections[Acceleration].junk_cost = 20;
+
     selections[Speed].txt = "I want to go faster!";
+    selections[Speed].junk_cost = 20;
+
     selections[Armor].txt = "Mmmh... I'm strong!";
+    selections[Armor].junk_cost = 20;
+
     selections[Exchange].txt = "Trade";
+    selections[Exchange].junk_cost = 10;
+
     selections[Reciever].txt = "Wow I can see where my home is :D";
+    selections[Reciever].junk_cost = 40;
+
     selections[Teleport].txt = "Maybe like StarTrek? Or I could end up dead?";
+    selections[Teleport].junk_cost = 50;
+
     selections[CokeHat].txt = "'Beer-On-A-Cap'. Oh My God!!";
+    selections[CokeHat].coveted_cost = 20;
+
     selections[Friend].txt = "Construct me a Friend. Not that I'm lonely.";
+    selections[Friend].coveted_cost = 100;
+
     selections[Exit].txt = "Go away from docking.";
 
     bad_snd = BUTLER->CreateSound( "snd/bad_choice.wav" );
@@ -148,49 +166,75 @@ void Dock::Execute()
 {
     if( selections[curr_selection].available ) {
         Selection &s = selections[curr_selection];
-        if( s.action != Exit ) select_snd.Play();
 
-        switch( s.action ) {
-            case Exit:
-                Deactivate();
-                break;
-            case Battery:
-                satellite.IncrMaxFuel( TWEAKS->GetNum( "fuel_incr" ) );
-                if( ++s.count >= 5 ) s.available = false;
-                break;
-            case Acceleration:
-                satellite.IncrBoost();
-                s.available = false;
-                break;
-            case Speed:
-                satellite.IncrSpeed( TWEAKS->GetNum( "speed_incr" ) );
-                if( ++s.count >= 2 ) s.available = false;
-                break;
-            case Armor:
-                satellite.IncrArmor( TWEAKS->GetNum( "armor_incr" ) );
-                if( ++s.count >= 2 ) s.available = false;
-                break;
-            case Reciever:
-                satellite.AddonWayHome();
-                s.available = false;
-                break;
-            case Teleport:
-                satellite.AddTeleport();
-                s.available = false;
-                break;
-            case Friend:
-                satellite.AddFriend();
-                s.available = false;
-                break;
-            case CokeHat:
-                satellite.AddBeerCap();
-                s.available = false;
-            default:
-                break;
+        if( !MeetsDemand( s ) ) {
+            bad_snd.Play();
+        }
+        else {
+            if( s.action != Exit ) select_snd.Play();
+
+            RetractDemand( s );
+
+            switch( s.action ) {
+                case Exit:
+                    Deactivate();
+                    break;
+                case Battery:
+                    satellite.IncrMaxFuel( TWEAKS->GetNum( "fuel_incr" ) );
+                    if( ++s.count >= 5 ) s.available = false;
+                    break;
+                case Acceleration:
+                    satellite.IncrBoost();
+                    s.available = false;
+                    break;
+                case Speed:
+                    satellite.IncrSpeed( TWEAKS->GetNum( "speed_incr" ) );
+                    if( ++s.count >= 2 ) s.available = false;
+                    break;
+                case Armor:
+                    satellite.IncrArmor( TWEAKS->GetNum( "armor_incr" ) );
+                    if( ++s.count >= 2 ) s.available = false;
+                    break;
+                case Reciever:
+                    satellite.AddonWayHome();
+                    s.available = false;
+                    break;
+                case Teleport:
+                    satellite.AddTeleport();
+                    s.available = false;
+                    break;
+                case Friend:
+                    satellite.AddFriend();
+                    s.available = false;
+                    break;
+                case CokeHat:
+                    satellite.AddBeerCap();
+                    s.available = false;
+                    break;
+                case Exchange:
+                    satellite.ChangeJunk( 10 );
+                    break;
+                default:
+                    break;
+            }
         }
     }
     else {
         bad_snd.Play();
     }
+}
+
+bool Dock::MeetsDemand( Selection &s )
+{
+    const int junk = satellite.JunkCollected();
+    const int coveted = satellite.CovetedCollected();
+
+    return junk >= s.junk_cost && coveted >= s.coveted_cost;
+}
+
+void Dock::RetractDemand( Selection &s )
+{
+    satellite.ChangeJunk( -s.junk_cost );
+    satellite.ChangeCoveted( -s.coveted_cost );
 }
 

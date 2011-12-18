@@ -40,6 +40,12 @@ public:
 
     void AddBeerCap();
 
+    void ChangeJunk( int mod );
+    int JunkCollected();
+
+    void ChangeCoveted( int mod );
+    int CovetedCollected();
+
     void Update( float dt );
     void Draw( Vec2i offset );
 private:
@@ -73,5 +79,8 @@ private:
     bool has_beer_cap;
     int speed_lvl;
     bool has_parabol;
+
+    int junk_collected;
+    int coveted_collected;
 };
 

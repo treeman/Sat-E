@@ -38,6 +38,11 @@ Chunk::Chunk( sf::IntRect rect, ItemGenerator _generator ) :
     for( size_t i = 0; i < 1; ++i ) {
         items.push_back( generator.CreateHealer( start_pos ) );
     }
+
+    // Generate some coveted stuff
+    for( size_t i = 0; i < 2; ++i ) {
+        items.push_back( generator.CreateCoveted( start_pos ) );
+    }
 }
 
 Items Chunk::GetItems()

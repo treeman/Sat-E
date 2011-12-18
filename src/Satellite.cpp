@@ -1,7 +1,7 @@
 #include "Satellite.hpp"
 
 Satellite::Satellite() : arrow_home(false), has_teleport(false), has_friend(false), has_beer_cap(false),
-    speed_lvl(0), has_parabol(false)
+    speed_lvl(0), has_parabol(false), junk_collected(0), coveted_collected(0)
 {
     pos = Vec2f( 100, 100 );
 
@@ -116,6 +116,30 @@ void Satellite::AddFriend()
 void Satellite::AddBeerCap()
 {
     has_beer_cap = true;
+}
+
+void Satellite::ChangeJunk( int mod )
+{
+    junk_collected += mod;
+    if( junk_collected < 0 ) {
+        L_("Negative junk collected!!\n");
+    }
+}
+int Satellite::JunkCollected()
+{
+    return junk_collected;
+}
+
+void Satellite::ChangeCoveted( int mod )
+{
+    coveted_collected += mod;
+    if( coveted_collected < 0 ) {
+        L_("Negative coveted collected!!\n");
+    }
+}
+int Satellite::CovetedCollected()
+{
+    return coveted_collected;
 }
 
 void Satellite::Update( float dt )

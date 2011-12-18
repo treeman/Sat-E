@@ -15,8 +15,6 @@ Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "sp
     const int window_w = Tree::GetWindowWidth();
     const int window_h = Tree::GetWindowHeight();
 
-    junk_collected = 0;
-
     life_spr = BUTLER->CreateSprite( "life" );
     life_spr.SetPosition( window_w - 120, window_h - 26 );
 
@@ -44,6 +42,7 @@ Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "sp
 
     hit_snd = BUTLER->CreateSound( "snd/Exp.wav" );
     heal_snd = BUTLER->CreateSound( "snd/heal.wav" );
+    coveted_snd = BUTLER->CreateSound( "snd/coveted.wav" );
 }
 
 void Space::HandleEvent( sf::Event &e )
@@ -148,7 +147,7 @@ void Space::Update( float dt )
     CenterCam( satellite.GetPos() );
 
     // Update GUI
-    junk_str.SetText( boost::lexical_cast<std::string>( junk_collected ) );
+    junk_str.SetText( boost::lexical_cast<std::string>( satellite.JunkCollected() ) );
 }
 
 void Space::Draw()
@@ -343,6 +342,9 @@ void Space::Intersects( ItemPtr item )
             satellite.ChangeLife( TWEAKS->GetNum( "asteroid_damage" ) );
             heal_snd.Play();
             break;
+        case AddCovet:
+            coveted_snd.Play();
+            break;
         default: break;
     }
 
@@ -376,7 +378,7 @@ void Space::DrawLife()
 
 void Space::JunkAdded( int num )
 {
-    junk_collected += num;
+    satellite.ChangeJunk( num );
     curr_junk_snd = junk_snd.Get();
     curr_junk_snd.Play();
 }

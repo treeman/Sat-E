@@ -27,6 +27,7 @@ public:
     ItemPtr CreateJunk( Vec2i offset = Vec2i::zero );
     ItemPtr CreateAsteroid( Vec2i offset = Vec2i::zero );
     ItemPtr CreateHealer( Vec2i offset = Vec2i::zero );
+    ItemPtr CreateCoveted( Vec2i offset = Vec2i::zero );
 
     Star CreateStar( Vec2i offset = Vec2i::zero );
 private:
@@ -34,6 +35,7 @@ private:
     SprBag junk_bag;
     SprBag asteroid_bag;
     SprBag healer_bag;
+    SprBag coveted_bag;
 
     Tree::ShuffleBag<Vec2i> position_bag;
 
