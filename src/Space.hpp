@@ -46,5 +46,7 @@ private:
     Vec2i cam;
 
     ItemGenerator generator;
+
+    void Intersects( ItemPtr item );
 };
 

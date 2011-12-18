@@ -12,13 +12,14 @@ int main()
               800             // width
             , 600             // height
             , true            // windowed
-            , "LD22!"         // window title
+            , "Sat-E!"        // window title
             , "settings.ini"  // settings file
             , true            // lazy drawing
         );
 
         // Initialize shared resources
-        Tree::GetTweaks()->Load( "magic_numbers.lua" );
+        // TODO this gets loaded automaticall... need to change it
+        //Tree::GetTweaks()->Load( "magic_numbers.lua" );
         Tree::GetButler()->LoadSprites( "sprites.lua" );
 
         // Push your gamestates here

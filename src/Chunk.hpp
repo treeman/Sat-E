@@ -7,6 +7,9 @@ class Chunk {
 public:
     Chunk( sf::IntRect rect, ItemGenerator generator );
 
+    Items GetItems();
+
+    void Update( float dt );
     void Draw( Vec2i offset );
 private:
     Vec2i start_pos;
@@ -16,7 +19,6 @@ private:
     Stars stars;
 
     // And no stripes
-    typedef std::vector<boost::shared_ptr<Item> > Items;
     Items items;
 
     // Item generator

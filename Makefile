@@ -11,8 +11,8 @@ SRC = $(wildcard $(SRCDIR)/*cpp)
 export OBJDIR = obj
 OBJ = $(patsubst %,$(OBJDIR)/%,$(SRC:.cpp=.o))
 
-EXE = bin/startme
-DEBUG_EXE = bin/startme-debug
+EXE = bin/Sat-E
+DEBUG_EXE = bin/Sat-E-debug
 
 .PHONY: all clean remake debug
 
@@ -30,6 +30,11 @@ $(OBJDIR)/%.o: %.cpp
 	@(mkdir -p $(@D))
 	$(CC) -c -o $@ $< $(CFLAGS)
 
+clean:
+	rm $(EXE) $(DEBUG_EXE) $(OBJDIR)/* .depend -rf
+
+remake: clean all
+
 # Generate dependency information for all source files
 .depend: $(SRC)
 	rm -f ./.depend
@@ -39,9 +44,4 @@ $(OBJDIR)/%.o: %.cpp
 	sed -i 's|\(^.*:\)|$(OBJDIR)/$(SRCDIR)/\1|g' ./.depend
 
 include .depend
-
-clean:
-	rm $(EXE) $(DEBUG_EXE) $(OBJDIR)/* -rf
-
-remake: clean all
 

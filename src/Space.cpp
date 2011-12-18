@@ -50,15 +50,28 @@ void Space::Update( float dt )
         box.IsClose( false );
     }
 
-    //for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
-        //(*it)->Update( dt );
-        //if( (*it)->BoundingBox().Intersects( satellite.BoundingBox() ) ) {
-            //L_ << "Intersecting!\n";
-        //}
-    //}
-
     // Update chunks, allocate more if needed
     UpdateSpaceChunks();
+
+    // The chunk we're at
+    Chunks::iterator it = chunks.find( CurrentChunkIndex() );
+    if( it != chunks.end() ) {
+        Chunk &chunk = it->second;
+
+        // Update our chunk and everything in it
+        chunk.Update( dt );
+
+        // Check intersections
+        Items items = chunk.GetItems();
+        for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
+            if( (*it)->BoundingBox().Intersects( satellite.BoundingBox() ) ) {
+                Intersects( *it );
+            }
+        }
+    }
+    else {
+        L_ << "couldn't find " << CurrentChunkIndex() << " chunk for updating\n";
+    }
 
     // Center cam on satellite
     CenterCam( satellite.GetPos() );
@@ -76,13 +89,8 @@ void Space::Draw()
         chunk.Draw( offset );
     }
     else {
-        L_ << "Couldn't find " << CurrentChunkIndex() << " chunk for rendering\n";
+        L_ << "couldn't find " << CurrentChunkIndex() << " chunk for rendering\n";
     }
-
-    // Draw items
-    //for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
-        //(*it)->Draw( offset );
-    //}
 
     box.Draw( offset );
 
@@ -172,5 +180,22 @@ void Space::CenterCam( Vec2i pos )
 
     cam.x = pos.x - w / 2;
     cam.y = pos.y - h / 2;
+}
+
+void Space::Intersects( ItemPtr item )
+{
+    switch( item->Behavior() ) {
+        case Nothing:
+            L_("I'm a master of nothing!\n");
+            break;
+        case AddJunk:
+            L_("Getting some junk added\n");
+            break;
+        case Hurts:
+            L_("Ouch!\n");
+            break;
+    }
+
+    item->Kill();
 }
 

@@ -9,6 +9,11 @@ sf::IntRect Junk::BoundingBox()
     return sf::IntRect( pos.x -5, pos.y -5, pos.x + 5, pos.y + 5 );
 }
 
+ItemBehavior Junk::Behavior()
+{
+    return AddJunk;
+}
+
 void Junk::Update( float dt )
 {
     spr.Rotate( TWEAKS->GetNum( "junk_rotate" ) * dt );

@@ -8,6 +8,8 @@ public:
 
     sf::IntRect BoundingBox();
 
+    ItemBehavior Behavior();
+
     void Update( float dt );
     void Draw( Vec2i offset );
 private:

@@ -1,5 +1,21 @@
-
 #include "Chunk.hpp"
+
+bool can_kill( ItemPtr item )
+{
+    return item->CanKill();
+}
+
+void DrawOutline( sf::IntRect box, Vec2i offset )
+{
+    sf::Shape border = sf::Shape::Rectangle( box.Left, box.Top, box.Right, box.Bottom,
+        Tree::Color( 0xFFFFFFFF ), 1.0, Tree::Color( 0xFFFFFFFF ) );
+    border.EnableFill( false );
+    border.EnableOutline( true );
+
+    border.Move( offset );
+
+    Tree::Draw( border );
+}
 
 Chunk::Chunk( sf::IntRect rect, ItemGenerator _generator ) :
     start_pos( rect.Left, rect.Top ), generator(_generator)
@@ -25,6 +41,22 @@ Chunk::Chunk( sf::IntRect rect, ItemGenerator _generator ) :
     }
 }
 
+Items Chunk::GetItems()
+{
+    return items;
+}
+
+void Chunk::Update( float dt )
+{
+    // Remove killable items
+    items.erase( std::remove_if( items.begin(), items.end(), can_kill ), items.end() );
+
+    // Update items
+    for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
+        (*it)->Update( dt );
+    }
+}
+
 void Chunk::Draw( Vec2i offset )
 {
     // Draw stars
@@ -35,6 +67,13 @@ void Chunk::Draw( Vec2i offset )
     // Draw items
     for( size_t i = 0; i < items.size(); ++i ) {
         items[i]->Draw( offset );
+    }
+
+    // Draw outlines
+    if( SETTINGS->GetValue<bool>( "bounding_box_show" ) ) {
+        for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
+            DrawOutline( (*it)->BoundingBox(), offset );
+        }
     }
 }
 

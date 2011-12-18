@@ -1,5 +1,10 @@
 #include "Item.hpp"
 
+Item::Item() : can_kill(false)
+{
+
+}
+
 sf::IntRect Item::BoundingBox()
 {
     return sf::IntRect();
@@ -8,6 +13,16 @@ sf::IntRect Item::BoundingBox()
 void Item::Accelerate( Vec2f _acc )
 {
     acc += _acc;
+}
+
+bool Item::CanKill()
+{
+    return can_kill;
+}
+
+void Item::Kill()
+{
+    can_kill = true;
 }
 
 void Item::Update( float dt )

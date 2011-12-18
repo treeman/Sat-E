@@ -6,9 +6,18 @@ class Item;
 
 // Lazy zzz
 typedef boost::shared_ptr<Item> ItemPtr;
+typedef std::vector<ItemPtr> Items;
+
+enum ItemBehavior {
+    Nothing,
+    AddJunk,
+    Hurts,
+};
 
 class Item {
 public:
+    Item();
+
     virtual ~Item() { }
 
     virtual sf::IntRect BoundingBox();
@@ -24,6 +33,12 @@ public:
 
     void SetPos( Vec2f p ) { pos = p; }
 
+    bool CanKill();
+    void Kill();
+
+    // Behavior when intersecting with it
+    virtual ItemBehavior Behavior() { return Nothing; }
+
     virtual void Update( float dt );
     virtual void Draw( Vec2i offset ) = 0;
 protected:
@@ -32,5 +47,7 @@ protected:
     Vec2f pos;
     Vec2f vel;
     Vec2f acc;
+
+    bool can_kill;
 };
 
