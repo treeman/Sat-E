@@ -9,6 +9,12 @@ Satellite::Satellite()
 
     move_snd = BUTLER->CreateSound( "snd/burst1.wav" );
     move_snd.SetLoop( true );
+
+    max_vel = TWEAKS->GetNum( "satellite_max_vel" );
+    fuel = max_fuel = 100;
+    life = max_life = 100;
+
+    boost = TWEAKS->GetNum( "satellite_acc" );
 }
 
 sf::IntRect Satellite::BoundingBox()
@@ -16,14 +22,28 @@ sf::IntRect Satellite::BoundingBox()
     return sf::IntRect( pos.x -5, pos.y -5, pos.x + 5, pos.y + 5 );
 }
 
-float Satellite::MaxVel()
+void Satellite::ChangeFuel( float mod )
 {
-    return TWEAKS->GetNum( "satellite_max_vel" );
+    fuel += mod;
+    if( fuel < 0 ) fuel = 0;
+    if( fuel > max_fuel ) fuel = max_fuel;
+}
+void Satellite::ChangeLife( float mod )
+{
+    life += mod;
+    if( life < 0 ) life = 0;
+    if( life > max_life ) life = max_life;
+}
+
+void Satellite::IncrBoost()
+{
+    L_( "Boost doubled!\n" );
+    boost *= 2;
 }
 
 void Satellite::Update( float dt )
 {
-    if( acc != Vec2f::zero && move_snd.GetStatus() != sf::Sound::Playing ) {
+    if( acc.Magnitude() > 0.5 && move_snd.GetStatus() != sf::Sound::Playing ) {
         move_snd.Play();
     }
     else if( acc == Vec2f::zero ) {

@@ -32,6 +32,7 @@ public:
     const Vec2f GetAcc() { return acc; }
 
     void SetPos( Vec2f p ) { pos = p; }
+    void SetPos( float x, float y ) { pos.x = x; pos.y = y; }
 
     bool CanKill();
     void Kill();

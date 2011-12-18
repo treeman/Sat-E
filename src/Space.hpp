@@ -7,10 +7,13 @@
 #include "Box.hpp"
 #include "Chunk.hpp"
 #include "ItemGenerator.hpp"
+#include "Dock.hpp"
 
 class Space {
 public:
     Space();
+
+    void HandleEvent( sf::Event &e );
 
     void Update( float dt );
     void Draw();
@@ -47,8 +50,6 @@ private:
 
     void Intersects( ItemPtr item );
 
-    int life;
-    int max_life;
     sf::Sprite life_spr;
 
     void DrawLife();
@@ -63,10 +64,17 @@ private:
 
     void DrawJunk();
 
-    float fuel;
-    float max_fuel;
     sf::Sprite fuel_spr;
 
     void DrawFuel();
+
+    // Docking menu
+    // Might find a better place for this later
+    // but then we'd have to create a new wrapper class maybe with gui this menu and space
+    // ... and that's a lot of code atm
+    // this will do for now
+    Dock dock;
+
+    bool can_activate_docking;
 };
 

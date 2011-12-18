@@ -1,7 +1,7 @@
 #include "Space.hpp"
 #include "Graphics.hpp"
 
-Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "space_chunk" ) )
+Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "space_chunk" ) ), dock( satellite )
 {
     SETTINGS->Register( "bounding_box_show", false );
     SETTINGS->Register( "chunk_count", false );
@@ -14,12 +14,6 @@ Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "sp
 
     const int window_w = Tree::GetWindowWidth();
     const int window_h = Tree::GetWindowHeight();
-
-    max_life = 100;
-    max_fuel = 100;
-
-    life = 100;
-    fuel = 100;
 
     junk_collected = 0;
 
@@ -34,46 +28,62 @@ Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "sp
     junk_str.SetPosition( 36, window_h - 28 );
 
     junk_snd.Add( BUTLER->CreateSound( "snd/Pickup_Coin.wav" ) )
-    .Add( BUTLER->CreateSound( "snd/Pickup_Coin2.wav" ) )
-    .Add( BUTLER->CreateSound( "snd/Pickup_Coin3.wav" ) )
-    .Add( BUTLER->CreateSound( "snd/Pickup_Coin4.wav" ) );
+            .Add( BUTLER->CreateSound( "snd/Pickup_Coin2.wav" ) )
+            .Add( BUTLER->CreateSound( "snd/Pickup_Coin3.wav" ) )
+            .Add( BUTLER->CreateSound( "snd/Pickup_Coin4.wav" ) );
 
     fuel_spr = BUTLER->CreateSprite( "fuel" );
     fuel_spr.SetPosition( window_w - 120, window_h - 46 );
+
+    can_activate_docking = false;
+
+    satellite.SetPos( 480, 480 );
+    box.SetPos( 500, 500 );
+}
+
+void Space::HandleEvent( sf::Event &e )
+{
+    if( dock.IsActive() ) {
+        dock.HandleEvent( e );
+    }
 }
 
 void Space::Update( float dt )
 {
+    if( dock.IsActive() ) {
+        dock.Update( dt );
+    }
+    else {
+        satellite.Update( dt ); // prevent movement when in docking mode
+
+        // Update movements for the satellite in a fluid manner
+        const sf::Input &input = GAME->GetInput();
+
+        Vec2i acc;
+        // Set direction
+        if( input.IsKeyDown( sf::Key::Left ) ) {
+            acc += Vec2f::left;
+        }
+        if( input.IsKeyDown( sf::Key::Right ) ) {
+            acc += Vec2f::right;
+        }
+        if( input.IsKeyDown( sf::Key::Up ) ) {
+            acc += Vec2f::up;
+        }
+        if( input.IsKeyDown( sf::Key::Down ) ) {
+            acc += Vec2f::down;
+        }
+
+        // Set size
+        acc.SetMagnitude( satellite.AccBoost() );
+
+        satellite.Accelerate( acc );
+    }
+
     box.Update( dt );
 
-    satellite.Update( dt );
-
-    // Update movements for the satellite in a fluid manner
-    const sf::Input &input = GAME->GetInput();
-
-    Vec2i acc;
-    // Set direction
-    if( input.IsKeyDown( sf::Key::Left ) ) {
-        acc += Vec2f::left;
-    }
-    if( input.IsKeyDown( sf::Key::Right ) ) {
-        acc += Vec2f::right;
-    }
-    if( input.IsKeyDown( sf::Key::Up ) ) {
-        acc += Vec2f::up;
-    }
-    if( input.IsKeyDown( sf::Key::Down ) ) {
-        acc += Vec2f::down;
-    }
-
     // Retract fuel
-    fuel -= TWEAKS->GetNum( "fuel_speed" ) * dt;
-    if( fuel < 0 ) fuel = 0;
-
-    // Set size
-    acc.SetMagnitude( TWEAKS->GetNum( "satellite_acc" ) );
-
-    satellite.Accelerate( acc );
+    satellite.ChangeFuel( - TWEAKS->GetNum( "fuel_speed" ) * dt );
 
     // Check for closeness to our docking system
     const Vec2f docking = satellite.GetPos() - box.GetPos();
@@ -81,11 +91,19 @@ void Space::Update( float dt )
         box.IsClose( true ); // Visible cue
 
         // Increase our fuel
-        fuel += TWEAKS->GetNum( "refuel_speed" ) * dt;
-        if( fuel > max_fuel ) fuel = max_fuel;
+        satellite.ChangeFuel( TWEAKS->GetNum( "refuel_speed" ) * dt );
+
+        // If we just entered docking
+        if( docking.Magnitude() <= 25 ) {
+            if( can_activate_docking ) {
+                dock.Activate();
+                can_activate_docking = false;
+            }
+        }
     }
     else {
         box.IsClose( false );
+        can_activate_docking = true;
     }
 
     // Update chunks, allocate more if needed
@@ -146,6 +164,9 @@ void Space::Draw()
     DrawLife();
     DrawJunk();
     DrawFuel();
+
+    // Draw docking on top, if we can ofc
+    if( dock.IsActive() ) { dock.Draw(); }
 }
 
 void Space::UpdateSpaceChunks()
@@ -236,7 +257,7 @@ void Space::DrawLife()
     const int w = 84;
     const int h = 10;
 
-    const float perc = (float)life / (float)max_life;
+    const float perc = satellite.Life() / satellite.MaxLife();
 
     const int hspace = 10;
     const int wspace = 10;
@@ -274,7 +295,7 @@ void Space::DrawFuel()
     const int w = 84;
     const int h = 10;
 
-    const float perc = fuel / max_fuel;
+    const float perc = satellite.Fuel() / satellite.MaxFuel();
 
     const int hspace = 30;
     const int wspace = 10;

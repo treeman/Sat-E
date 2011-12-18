@@ -9,6 +9,7 @@ Game::Game()
 
 bool Game::HandleEvent( sf::Event &e )
 {
+    space.HandleEvent( e );
     return true;
 }
 
