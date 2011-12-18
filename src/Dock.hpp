@@ -4,22 +4,27 @@
 #include "Satellite.hpp"
 
 enum Action {
-    Exit,
     Battery,
     Acceleration,
     Speed,
     Armor,
+    Exchange,
     Reciever,
     Teleport,
+    CokeHat,
+    Friend,
+    Exit,
+
+    NumActions,
 };
 
 struct Selection {
     Selection() : available(true), count(0) { }
 
     bool available;
-    std::string txt;
     Action action;
     int count;
+    std::string txt;
 };
 
 class Dock {
@@ -41,7 +46,6 @@ private:
 
     sf::String str;
 
-    void AddSelection( std::string txt, Action action = Exit );
     std::vector<Selection> selections;
 
     int curr_selection;

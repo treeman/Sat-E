@@ -1,6 +1,6 @@
 #include "Satellite.hpp"
 
-Satellite::Satellite() : arrow_home(false), has_teleport(false)
+Satellite::Satellite() : arrow_home(false), has_teleport(false), has_friend(false), has_coke_hat(false)
 {
     pos = Vec2f( 100, 100 );
 
@@ -83,6 +83,16 @@ void Satellite::Teleport()
 void Satellite::AddTeleport()
 {
     has_teleport = true;
+}
+
+void Satellite::AddFriend()
+{
+    has_friend = true;
+}
+
+void Satellite::AddCokeHat()
+{
+    has_coke_hat = true;
 }
 
 void Satellite::Update( float dt )

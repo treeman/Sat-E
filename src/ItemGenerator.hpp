@@ -8,6 +8,8 @@ class Star {
 public:
     Star( Vec2i _pos, Tree::Color _color );
 
+    Vec2i GetPos() { return pos; }
+
     void Move( Vec2i offset );
     void Draw( Vec2i offset );
 private:

@@ -139,27 +139,7 @@ void Space::Update( float dt )
     }
 
     // Update chunks, allocate more if needed
-    UpdateSpaceChunks();
-
-    // The chunk we're at
-    Chunks::iterator it = chunks.find( CurrentChunkIndex() );
-    if( it != chunks.end() ) {
-        Chunk &chunk = it->second;
-
-        // Update our chunk and everything in it
-        chunk.Update( dt );
-
-        // Check intersections
-        Items items = chunk.GetItems();
-        for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
-            if( (*it)->BoundingBox().Intersects( satellite.BoundingBox() ) ) {
-                Intersects( *it );
-            }
-        }
-    }
-    else {
-        L_ << "couldn't find " << CurrentChunkIndex() << " chunk for updating\n";
-    }
+    UpdateChunks( dt );
 
     // Center cam on satellite
     CenterCam( satellite.GetPos() );
@@ -173,15 +153,20 @@ void Space::Draw()
     Vec2i offset = -cam;
     Tree::ClearWindow( Tree::Color( 0xFF000000 ) );
 
-    // Draw the chunk we're at
-    Chunks::iterator it = chunks.find( CurrentChunkIndex() );
-    if( it != chunks.end() ) {
-        Chunk &chunk = it->second;
-        chunk.Draw( offset );
-    }
-    else {
-        L_ << "couldn't find " << CurrentChunkIndex() << " chunk for rendering\n";
-    }
+    Vec2i chunk = CurrentChunkIndex();
+
+    DrawChunk( chunk, offset );
+
+    // Draw surrounding chunks
+    DrawChunk( chunk.x - 1, chunk.y, offset );
+    DrawChunk( chunk.x + 1, chunk.y, offset );
+    DrawChunk( chunk.x, chunk.y - 1, offset );
+    DrawChunk( chunk.x, chunk.y + 1, offset );
+
+    DrawChunk( chunk.x - 1, chunk.y - 1, offset );
+    DrawChunk( chunk.x - 1, chunk.y + 1, offset );
+    DrawChunk( chunk.x + 1, chunk.y - 1, offset );
+    DrawChunk( chunk.x + 1, chunk.y + 1, offset );
 
     box.Draw( offset );
 
@@ -206,7 +191,20 @@ void Space::Draw()
     if( dock.IsActive() ) { dock.Draw(); }
 }
 
-void Space::UpdateSpaceChunks()
+void Space::DrawChunk( int x, int y, Vec2i offset ) { DrawChunk( Vec2i( x, y), offset ); }
+void Space::DrawChunk( Vec2i index, Vec2i offset )
+{
+    Chunks::iterator it = chunks.find( index );
+    if( it != chunks.end() ) {
+        Chunk &chunk = it->second;
+        chunk.Draw( offset, sf::IntRect( cam.x, cam.y, cam.x + Tree::GetWindowWidth(), cam.y + Tree::GetWindowHeight() ) );
+    }
+    else {
+        L_( "Couldn't find %d chunk for rendering" );
+    }
+}
+
+void Space::UpdateChunks( float dt )
 {
     const Vec2i chunk_index = CurrentChunkIndex();
 
@@ -217,20 +215,76 @@ void Space::UpdateSpaceChunks()
         Tree::VisualDebug( ss.str() );
     }
 
-    // Not yet allocated
-    if( existing_chunks.find( chunk_index ) == existing_chunks.end() ) {
+    // Not yet checked chunk
+    if( checked_chunks.find( chunk_index ) == checked_chunks.end() ) {
+        // Allocate this chunk (probably done but it gets checked anyway
         AllocateChunk( chunk_index );
+        // Allocate surrounding chunks
+        AllocateChunk( chunk_index.x - 1, chunk_index.y );
+        AllocateChunk( chunk_index.x + 1, chunk_index.y );
+        AllocateChunk( chunk_index.x, chunk_index.y - 1 );
+        AllocateChunk( chunk_index.x, chunk_index.y + 1 );
+
+        AllocateChunk( chunk_index.x - 1, chunk_index.y - 1 );
+        AllocateChunk( chunk_index.x - 1, chunk_index.y + 1 );
+        AllocateChunk( chunk_index.x + 1, chunk_index.y - 1 );
+        AllocateChunk( chunk_index.x + 1, chunk_index.y + 1 );
     }
 
+    // Debug current chunks
     if( SETTINGS->GetValue<bool>( "chunk_count" ) ) {
         std::stringstream ss;
         ss << chunks.size() << " chunks\n";
         Tree::VisualDebug( ss.str() );
     }
+
+    // Update all visible chunks!
+    UpdateChunk( chunk_index, dt );
+
+    UpdateChunk( chunk_index.x - 1, chunk_index.y, dt );
+    UpdateChunk( chunk_index.x + 1, chunk_index.y, dt );
+    UpdateChunk( chunk_index.x, chunk_index.y - 1, dt );
+    UpdateChunk( chunk_index.x, chunk_index.y + 1, dt );
+
+    UpdateChunk( chunk_index.x - 1, chunk_index.y - 1, dt );
+    UpdateChunk( chunk_index.x - 1, chunk_index.y + 1, dt );
+    UpdateChunk( chunk_index.x + 1, chunk_index.y - 1, dt );
+    UpdateChunk( chunk_index.x + 1, chunk_index.y + 1, dt );
 }
 
+void Space::UpdateChunk( int x, int y, float dt )
+{
+    UpdateChunk( Vec2i( x, y ), dt );
+}
+void Space::UpdateChunk( Vec2i index, float dt )
+{
+    // The chunk we're at
+    Chunks::iterator it = chunks.find( index );
+    if( it != chunks.end() ) {
+        Chunk &chunk = it->second;
+
+        // Update our chunk and everything in it
+        chunk.Update( dt );
+
+        // Check intersections
+        Items items = chunk.GetItems();
+        for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
+            if( (*it)->BoundingBox().Intersects( satellite.BoundingBox() ) ) {
+                Intersects( *it );
+            }
+        }
+    }
+    else {
+        L_("couldn't find %d index chunk for updating\n");
+    }
+}
+
+void Space::AllocateChunk( int x, int y ) { AllocateChunk( Vec2i( x, y ) ); }
 void Space::AllocateChunk( Vec2i chunk_index )
 {
+    // Already allocated
+    if( existing_chunks.find( chunk_index ) != existing_chunks.end() ) return;
+
     // Make a chunk!
     Chunk chunk( ChunkRect( chunk_index ), generator );
 

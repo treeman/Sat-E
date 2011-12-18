@@ -10,7 +10,7 @@ public:
     Items GetItems();
 
     void Update( float dt );
-    void Draw( Vec2i offset );
+    void Draw( Vec2i offset, sf::IntRect visible );
 private:
     Vec2i start_pos;
 

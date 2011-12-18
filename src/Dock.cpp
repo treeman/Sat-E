@@ -7,18 +7,23 @@ Dock::Dock( Satellite &sat ) : satellite(sat)
 
     Deactivate();
 
-    // Init selections
-    AddSelection( "Battery", Battery );
-    AddSelection( "Acceleration", Acceleration );
-    AddSelection( "Speed", Speed );
-    AddSelection( "Metal plating", Armor );
-    AddSelection( "Exchange" );
+    // Init selections in a slightly ugly way ^^
+    for( int i = 0; i < NumActions; ++i ) {
+        Selection selection;
+        selection.action = (Action)i;
+        selections.push_back( selection );
+    }
 
-    AddSelection( "Reciever", Reciever );
-    AddSelection( "Teleport", Teleport );
-    AddSelection( "Coke-Hat" );
-    AddSelection( "Girlfriend" );
-    AddSelection( "Close" );
+    selections[Battery].txt = "I can go further!";
+    selections[Acceleration].txt = "Better handling, better controll.";
+    selections[Speed].txt = "I want to go faster!";
+    selections[Armor].txt = "Mmmh... I'm strong!";
+    selections[Exchange].txt = "Trade";
+    selections[Reciever].txt = "Wow I can see where my home is :D";
+    selections[Teleport].txt = "Maybe like StarTrek? Or I could end up dead?";
+    selections[CokeHat].txt = "'Beer-On-A-Cap'. Oh My God!!";
+    selections[Friend].txt = "Construct me a Friend. Not that I'm lonely.";
+    selections[Exit].txt = "Go away from docking.";
 
     bad_snd = BUTLER->CreateSound( "snd/bad_choice.wav" );
     select_snd = BUTLER->CreateSound( "snd/Powerup.wav" );
@@ -71,8 +76,7 @@ bool Dock::HandleEvent( sf::Event &e )
 
 void Dock::AddTeleport()
 {
-    // Magic :o scary shit...
-    selections[6].available = true;
+    selections[Teleport].available = true;
 }
 
 void Dock::Update( float dt )
@@ -97,30 +101,22 @@ void Dock::Draw()
             const int yp = topleft.y + (w + y_space) * y;
             Tree::Draw( sf::Shape::Rectangle( xp, yp, xp + w, yp + h, Tree::Color( 0xffffffff ) ) );
 
-            const int i = x + y * rows;
-            str.SetText( selections[i].txt );
-            str.SetPosition( xp, yp );
-            if( i == curr_selection ) {
-                str.SetColor( Tree::Color( 0xffff0000 ) );
-            }
-            else {
-                str.SetColor( Tree::Color( 0xff00ff00 ) );
-            }
-            Tree::Draw( str );
+            //const int i = x + y * rows;
+            //str.SetText( selections[i].txt );
+            //str.SetPosition( xp, yp );
+            //if( i == curr_selection ) {
+                //str.SetColor( Tree::Color( 0xffff0000 ) );
+            //}
+            //else {
+                //str.SetColor( Tree::Color( 0xff00ff00 ) );
+            //}
+            //Tree::Draw( str );
         }
     }
 
     str.SetText( selections[curr_selection].txt );
-    str.SetPosition( 300, 250 );
+    str.SetPosition( 200, 250 );
     Tree::Draw( str );
-}
-
-void Dock::AddSelection( std::string txt, Action action )
-{
-    Selection selection;
-    selection.txt = txt;
-    selection.action = action;
-    selections.push_back( selection );
 }
 
 // rows = 5 magic variable :)
@@ -182,6 +178,13 @@ void Dock::Execute()
                 satellite.AddTeleport();
                 s.available = false;
                 break;
+            case Friend:
+                satellite.AddFriend();
+                s.available = false;
+                break;
+            case CokeHat:
+                satellite.AddCokeHat();
+                s.available = false;
             default:
                 break;
         }

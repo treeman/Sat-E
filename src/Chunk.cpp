@@ -46,22 +46,31 @@ void Chunk::Update( float dt )
     }
 }
 
-void Chunk::Draw( Vec2i offset )
+void Chunk::Draw( Vec2i offset, sf::IntRect visible )
 {
     // Draw stars
     for( size_t i = 0; i < stars.size(); ++i ) {
-        stars[i].Draw( offset );
+        const Vec2i &pos = stars[i].GetPos();
+        if( visible.Contains( pos.x, pos.y ) ) {
+            stars[i].Draw( offset );
+        }
     }
 
     // Draw items
     for( size_t i = 0; i < items.size(); ++i ) {
-        items[i]->Draw( offset );
+        const Vec2i &pos = items[i]->GetPos();
+        if( visible.Contains( pos.x, pos.y ) ) {
+            items[i]->Draw( offset );
+        }
     }
 
     // Draw outlines
     if( SETTINGS->GetValue<bool>( "bounding_box_show" ) ) {
         for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
-            draw_outline( (*it)->BoundingBox(), offset );
+            const Vec2i &pos = (*it)->GetPos();
+            if( visible.Contains( pos.x, pos.y ) ) {
+                draw_outline( (*it)->BoundingBox(), offset );
+            }
         }
     }
 }

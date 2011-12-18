@@ -9,27 +9,38 @@ Will want to collect an X number of stuff I think? Because... Hmm... So he can b
     DONE Need to randomize talk
     And scripted talks when e.g. picking up stuff
 DONE * Fuel system
-* Pickups
+DONE * Pickups
 * Asteroids to avoid
-* Stars? Black holes?
-* Docking station
-* Directional arrow
-* Endless space
+DONE * Stars?
+* Black holes?
+DONE * Docking station
+DONE * Directional arrow
+DONE * Endless space
     DONE Not just a window full of space...
     DONE need to only render what's visible, framerates quickly die
-    Display and generate neighbouring chunks
+    DONE Display and generate neighbouring chunks
 * Epic background display
     Supernovas
     Comets
     Hidden cat comet :o
+* Need to pay for upgrades
+* Need to handle victory/game over
+* Upgrades should be reflected on satellite
+    Size, etc
 
 # Gameplay
 * Collect different stuff
 * Venture deeper into space to find stuff, but not too far or you'll run out of fuel!!
 * Better stuff further away
 * Deposit finds on docking station and get upgrades in return
-    Speed
-    Finding locator
-    Different strengths to survive meteor hits
-    something more...
+    DONE Speed
+    DONE Acceleration
+    DONE Teleport
+    DONE Finding locator
+    DONE Life
+    DONE Reciever, arrow home
+    DONE Fuel/Battery
+    Coke-Hat
+    Girlfriend/Friend
+
 

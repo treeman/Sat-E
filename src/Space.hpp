@@ -26,10 +26,14 @@ private:
     Box box;
 
     // Check space so we're in an initialized zone
-    void UpdateSpaceChunks();
+    void UpdateChunks( float dt );
+
+    void UpdateChunk( int x, int y, float dt );
+    void UpdateChunk( Vec2i chunk, float dt );
 
     // Allocate space objects inside rect
     void AllocateChunk( Vec2i chunk_index );
+    void AllocateChunk( int x, int y );
 
     // Return the current space chunk we're viewing
     Vec2i CurrentChunkIndex();
@@ -37,11 +41,14 @@ private:
 
     // Chunks we've allocated
     std::set<Vec2i> existing_chunks;
+    // Chunks we've generated surroundings for
+    std::set<Vec2i> checked_chunks;
     // Chunks collecting all stuff inside them
     typedef std::map<Vec2i, Chunk> Chunks;
     Chunks chunks;
 
-    void DrawChunk( Vec2i chunk );
+    void DrawChunk( int x, int y, Vec2i offset );
+    void DrawChunk( Vec2i chunk, Vec2i offset );
 
     void CenterCam( Vec2i pos );
     Vec2i cam;

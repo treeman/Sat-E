@@ -35,6 +35,11 @@ public:
     void Teleport();
     void AddTeleport();
 
+    void AddFriend(); // w00p!
+    bool HasFriend() { return has_friend; }
+
+    void AddCokeHat();
+
     void Update( float dt );
     void Draw( Vec2i offset );
 private:
@@ -55,5 +60,9 @@ private:
 
     bool arrow_home;
     bool has_teleport;
+    bool has_friend;
+
+    // Appearance
+    bool has_coke_hat;
 };
 
