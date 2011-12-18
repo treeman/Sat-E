@@ -38,13 +38,11 @@ public:
     void AddFriend(); // w00p!
     bool HasFriend() { return has_friend; }
 
-    void AddCokeHat();
+    void AddBeerCap();
 
     void Update( float dt );
     void Draw( Vec2i offset );
 private:
-    sf::Sprite main;
-
     sf::Sound move_snd;
 
     Narrative narrative;
@@ -62,7 +60,18 @@ private:
     bool has_teleport;
     bool has_friend;
 
-    // Appearance
-    bool has_coke_hat;
+    sf::Sprite main_spr;
+    sf::Sprite beer_cap_spr;
+
+    sf::Sprite speed1_spr;
+    sf::Sprite speed2_spr;
+
+    sf::Sprite teleport_spr;
+    sf::Sprite recievers_spr;
+    sf::Sprite parabol_spr;
+
+    bool has_beer_cap;
+    int speed_lvl;
+    bool has_parabol;
 };
 

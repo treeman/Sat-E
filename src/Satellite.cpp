@@ -1,12 +1,33 @@
 #include "Satellite.hpp"
 
-Satellite::Satellite() : arrow_home(false), has_teleport(false), has_friend(false), has_coke_hat(false)
+Satellite::Satellite() : arrow_home(false), has_teleport(false), has_friend(false), has_beer_cap(false),
+    speed_lvl(0), has_parabol(false)
 {
     pos = Vec2f( 100, 100 );
 
-    main = BUTLER->CreateSprite( "gfx/basic.png" );
-    main.SetCenter( 5, 5 );
+    // Sprite loading
+    main_spr = BUTLER->CreateSprite( "base_satellite" );
+    main_spr.SetCenter( 7, 7 );
 
+    beer_cap_spr = BUTLER->CreateSprite( "beer_cap" );
+    beer_cap_spr.SetCenter( 7, 7 );
+
+    speed1_spr = BUTLER->CreateSprite( "speed1" );
+    speed1_spr.SetCenter( 7, 7 );
+
+    speed2_spr = BUTLER->CreateSprite( "speed2" );
+    speed2_spr.SetCenter( 7, 7 );
+
+    teleport_spr = BUTLER->CreateSprite( "teleport" );
+    teleport_spr.SetCenter( 7, 7 );
+
+    recievers_spr = BUTLER->CreateSprite( "recievers" );
+    recievers_spr.SetCenter( 14, 7 );
+
+    parabol_spr = BUTLER->CreateSprite( "parabol" );
+    parabol_spr.SetCenter( 7, 7 );
+
+    // Other stuff ^^
     move_snd = BUTLER->CreateSound( "snd/burst1.wav" );
     move_snd.SetLoop( true );
 
@@ -39,12 +60,14 @@ void Satellite::IncrBoost()
 {
     boost += TWEAKS->GetNum( "acc_incr" );
     L_( "Boost :%.1f\n", boost );
+    has_parabol = true;
 }
 
 void Satellite::IncrSpeed( float speed )
 {
     max_vel += speed;
     L_( "My god MOAR SPEED: %.1f\n", max_vel );
+    ++speed_lvl;
 }
 
 void Satellite::IncrMaxFuel( float mod )
@@ -90,9 +113,9 @@ void Satellite::AddFriend()
     has_friend = true;
 }
 
-void Satellite::AddCokeHat()
+void Satellite::AddBeerCap()
 {
-    has_coke_hat = true;
+    has_beer_cap = true;
 }
 
 void Satellite::Update( float dt )
@@ -111,15 +134,53 @@ void Satellite::Update( float dt )
 
     float degree = 180 / math::PI * angle;
 
-    main.Rotate( degree * dt );
+    main_spr.Rotate( degree * dt );
 }
 
 void Satellite::Draw( Vec2i offset )
 {
-    main.SetPosition( pos + offset );
-    Tree::Draw( main );
+    Vec2i draw_pos = pos + offset;
+    float rot = main_spr.GetRotation();
 
-    narrative.SetPos( pos + offset );
+    main_spr.SetPosition( draw_pos );
+    Tree::Draw( main_spr );
+
+    if( has_parabol ) {
+        parabol_spr.SetPosition( draw_pos );
+        parabol_spr.SetRotation( rot );
+        Tree::Draw( parabol_spr );
+    }
+
+    if( speed_lvl == 1 ) {
+        speed1_spr.SetPosition( draw_pos );
+        speed1_spr.SetRotation( rot );
+        Tree::Draw( speed1_spr );
+    }
+    else if( speed_lvl > 1 ) {
+        speed2_spr.SetPosition( draw_pos );
+        speed2_spr.SetRotation( rot );
+        Tree::Draw( speed2_spr );
+    }
+
+    if( has_beer_cap ) {
+        beer_cap_spr.SetPosition( draw_pos );
+        beer_cap_spr.SetRotation( rot );
+        Tree::Draw( beer_cap_spr );
+    }
+
+    if( has_teleport ) {
+        teleport_spr.SetPosition( draw_pos );
+        teleport_spr.SetRotation( rot );
+        Tree::Draw( teleport_spr );
+    }
+
+    if( arrow_home ) {
+        recievers_spr.SetPosition( draw_pos );
+        recievers_spr.SetRotation( rot );
+        Tree::Draw( recievers_spr );
+    }
+
+    narrative.SetPos( draw_pos );
     narrative.Draw();
 }
 

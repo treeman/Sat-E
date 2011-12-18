@@ -183,7 +183,7 @@ void Dock::Execute()
                 s.available = false;
                 break;
             case CokeHat:
-                satellite.AddCokeHat();
+                satellite.AddBeerCap();
                 s.available = false;
             default:
                 break;
