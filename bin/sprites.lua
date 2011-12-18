@@ -25,3 +25,10 @@ fuel = {
     w = 20, h = 20,
 }
 
+arrowhome = {
+    path = "gfx/objects.png",
+    x = 0, y = 20,
+    w = 20, h = 20,
+    hot_x = 10, hot_y = 10,
+}
+

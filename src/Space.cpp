@@ -39,12 +39,26 @@ Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "sp
 
     satellite.SetPos( 480, 480 );
     box.SetPos( 500, 500 );
+
+    arrow_home_spr = BUTLER->CreateSprite( "arrowhome" );
 }
 
 void Space::HandleEvent( sf::Event &e )
 {
     if( dock.IsActive() ) {
         dock.HandleEvent( e );
+    }
+    else {
+        if( e.Type == sf::Event::KeyPressed ) {
+            switch( e.Key.Code ) {
+                case sf::Key::Space:
+                    if( satellite.CanTeleport() ) {
+                        Teleport();
+                    }
+                    break;
+                default: break;
+            }
+        }
     }
 }
 
@@ -85,8 +99,13 @@ void Space::Update( float dt )
     // Retract fuel
     satellite.ChangeFuel( - TWEAKS->GetNum( "fuel_speed" ) * dt );
 
+    // Off centered... Would want a better way but meh
+    Vec2f sat_pos = satellite.GetPos();
+    sat_pos.x += 5; sat_pos.y += 5;
+
+    const Vec2f docking = sat_pos - box.GetPos();
+
     // Check for closeness to our docking system
-    const Vec2f docking = satellite.GetPos() - box.GetPos();
     if( docking.Magnitude() <= 30 ) { // We're close!!
         box.IsClose( true ); // Visible cue
 
@@ -104,6 +123,19 @@ void Space::Update( float dt )
     else {
         box.IsClose( false );
         can_activate_docking = true;
+    }
+
+    // Home arrow
+    if( satellite.SeesWayHome() && docking.Magnitude() > 200 ) {
+        Vec2f show_home = docking;
+        show_home.SetMagnitude( 50 );
+        Vec2f arrow_pos = sat_pos - show_home;
+        arrow_home_spr.SetPosition( arrow_pos );
+
+        float angle = - atan2( show_home.y, show_home.x );
+
+        float degree = 180 / math::PI * angle;
+        arrow_home_spr.SetRotation( degree );
     }
 
     // Update chunks, allocate more if needed
@@ -138,7 +170,7 @@ void Space::Update( float dt )
 
 void Space::Draw()
 {
-    const Vec2i offset = -cam;
+    Vec2i offset = -cam;
     Tree::ClearWindow( Tree::Color( 0xFF000000 ) );
 
     // Draw the chunk we're at
@@ -155,6 +187,11 @@ void Space::Draw()
 
     // Draw satellite
     satellite.Draw( offset );
+
+    if( satellite.SeesWayHome() ) {
+        arrow_home_spr.Move( offset );
+        Tree::Draw( arrow_home_spr );
+    }
 
     if( SETTINGS->GetValue<bool>( "bounding_box_show" ) ) {
         draw_outline( satellite.BoundingBox(), -cam );
@@ -310,5 +347,14 @@ void Space::DrawFuel()
     );
 
     Tree::Draw( fuel_spr );
+}
+
+void Space::Teleport()
+{
+    satellite.Teleport();
+    dock.AddTeleport();
+    satellite.SetPos( 480, 480 );
+
+    can_activate_docking = false;
 }
 

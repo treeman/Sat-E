@@ -76,5 +76,9 @@ private:
     Dock dock;
 
     bool can_activate_docking;
+
+    sf::Sprite arrow_home_spr;
+
+    void Teleport();
 };
 

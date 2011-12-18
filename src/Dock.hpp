@@ -8,14 +8,18 @@ enum Action {
     Battery,
     Acceleration,
     Speed,
+    Armor,
+    Reciever,
+    Teleport,
 };
 
 struct Selection {
-    Selection() : available(true) { }
+    Selection() : available(true), count(0) { }
 
     bool available;
     std::string txt;
     Action action;
+    int count;
 };
 
 class Dock {
@@ -27,6 +31,8 @@ public:
     void Deactivate();
 
     bool HandleEvent( sf::Event &e );
+
+    void AddTeleport();
 
     void Update( float dt );
     void Draw();

@@ -25,6 +25,15 @@ public:
 
     void IncrBoost();
     void IncrSpeed( float speed );
+    void IncrMaxFuel( float mod );
+    void IncrArmor( float mod ); // actually life... but w/e
+
+    bool SeesWayHome();   // Arrow pointing home?
+    void AddonWayHome(); // We can see home now?
+
+    bool CanTeleport();
+    void Teleport();
+    void AddTeleport();
 
     void Update( float dt );
     void Draw( Vec2i offset );
@@ -43,5 +52,8 @@ private:
     float fuel;
 
     float boost;
+
+    bool arrow_home;
+    bool has_teleport;
 };
 

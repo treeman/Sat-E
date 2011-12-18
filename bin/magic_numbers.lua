@@ -29,6 +29,12 @@ fuel_col = 0xff210029
 fuel_background = 0xff6D6DB6
 fuel_edge = 0xff929292
 
-fuel_speed = 1.0
-refuel_speed = 10.0
+fuel_speed = 3.0 -- how fast we're using fuel
+refuel_speed = 50.0 -- recharge at dock
+
+-- upgrades
+fuel_incr = 50 -- how much to increase fuel every time we buy
+speed_incr = satellite_max_vel / 2
+acc_incr = satellite_acc
+armor_incr = 40
 

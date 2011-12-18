@@ -1,6 +1,6 @@
 #include "Satellite.hpp"
 
-Satellite::Satellite()
+Satellite::Satellite() : arrow_home(false), has_teleport(false)
 {
     pos = Vec2f( 100, 100 );
 
@@ -37,8 +37,52 @@ void Satellite::ChangeLife( float mod )
 
 void Satellite::IncrBoost()
 {
-    L_( "Boost doubled!\n" );
-    boost *= 2;
+    boost += TWEAKS->GetNum( "acc_incr" );
+    L_( "Boost :%.1f\n", boost );
+}
+
+void Satellite::IncrSpeed( float speed )
+{
+    max_vel += speed;
+    L_( "My god MOAR SPEED: %.1f\n", max_vel );
+}
+
+void Satellite::IncrMaxFuel( float mod )
+{
+    max_fuel += mod;
+    fuel = max_fuel;
+    L_( "Fuel boost, now %.1f\n", max_fuel );
+}
+
+void Satellite::IncrArmor( float mod )
+{
+    max_life += mod;
+    life = max_life;
+    L_( "Ah I'm healthy!: %.1f\n", max_life );
+}
+
+bool Satellite::SeesWayHome()
+{
+    return arrow_home;
+}
+void Satellite::AddonWayHome()
+{
+    arrow_home = true;
+}
+
+bool Satellite::CanTeleport()
+{
+    return has_teleport;
+}
+void Satellite::Teleport()
+{
+    has_teleport = false;
+    acc = Vec2f::zero;
+    vel = Vec2f::zero;
+}
+void Satellite::AddTeleport()
+{
+    has_teleport = true;
 }
 
 void Satellite::Update( float dt )

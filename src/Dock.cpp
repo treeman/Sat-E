@@ -11,11 +11,11 @@ Dock::Dock( Satellite &sat ) : satellite(sat)
     AddSelection( "Battery", Battery );
     AddSelection( "Acceleration", Acceleration );
     AddSelection( "Speed", Speed );
-    AddSelection( "Metal plating" );
+    AddSelection( "Metal plating", Armor );
     AddSelection( "Exchange" );
 
-    AddSelection( "Reciever" );
-    AddSelection( "Teleport" );
+    AddSelection( "Reciever", Reciever );
+    AddSelection( "Teleport", Teleport );
     AddSelection( "Coke-Hat" );
     AddSelection( "Girlfriend" );
     AddSelection( "Close" );
@@ -67,6 +67,12 @@ bool Dock::HandleEvent( sf::Event &e )
         }
     }
     return true;
+}
+
+void Dock::AddTeleport()
+{
+    // Magic :o scary shit...
+    selections[6].available = true;
 }
 
 void Dock::Update( float dt )
@@ -145,19 +151,36 @@ void Dock::MoveRight()
 void Dock::Execute()
 {
     if( selections[curr_selection].available ) {
-        if( selections[curr_selection].action != Exit ) select_snd.Play();
+        Selection &s = selections[curr_selection];
+        if( s.action != Exit ) select_snd.Play();
 
-        switch( selections[curr_selection].action ) {
+        switch( s.action ) {
             case Exit:
                 Deactivate();
                 break;
             case Battery:
+                satellite.IncrMaxFuel( TWEAKS->GetNum( "fuel_incr" ) );
+                if( ++s.count >= 5 ) s.available = false;
                 break;
             case Acceleration:
                 satellite.IncrBoost();
-                selections[curr_selection].available = false;
+                s.available = false;
                 break;
             case Speed:
+                satellite.IncrSpeed( TWEAKS->GetNum( "speed_incr" ) );
+                if( ++s.count >= 2 ) s.available = false;
+                break;
+            case Armor:
+                satellite.IncrArmor( TWEAKS->GetNum( "armor_incr" ) );
+                if( ++s.count >= 2 ) s.available = false;
+                break;
+            case Reciever:
+                satellite.AddonWayHome();
+                s.available = false;
+                break;
+            case Teleport:
+                satellite.AddTeleport();
+                s.available = false;
                 break;
             default:
                 break;
