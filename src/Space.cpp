@@ -3,42 +3,35 @@
 
 Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "space_chunk" ) ), dock( satellite )
 {
+    // Settings
     SETTINGS->Register( "bounding_box_show", false );
     SETTINGS->Register( "chunk_count", false );
     SETTINGS->Register( "show_pos", false );
 
-    star_colors.push_back( TWEAKS->GetNum( "star_col1" ) );
-    star_colors.push_back( TWEAKS->GetNum( "star_col2" ) );
-    star_colors.push_back( TWEAKS->GetNum( "star_col3" ) );
-    star_colors.push_back( TWEAKS->GetNum( "star_col4" ) );
+    //star_colors.push_back( TWEAKS->GetNum( "star_col1" ) );
+    //star_colors.push_back( TWEAKS->GetNum( "star_col2" ) );
+    //star_colors.push_back( TWEAKS->GetNum( "star_col3" ) );
+    //star_colors.push_back( TWEAKS->GetNum( "star_col4" ) );
 
-    const int window_w = Tree::GetWindowWidth();
-    const int window_h = Tree::GetWindowHeight();
-
-    life_spr = BUTLER->CreateSprite( "life" );
-    life_spr.SetPosition( window_w - 120, window_h - 26 );
-
-    junk_spr = BUTLER->CreateSprite( "junk" );
-    junk_spr.SetPosition( 10, window_h - 30 );
-
-    junk_str = BUTLER->CreateString( "fnt/consola.ttf", 15 );
-    junk_str.SetColor( Tree::Color( 0xffcccccc ) );
-    junk_str.SetPosition( 36, window_h - 28 );
-
-    junk_snd.Add( BUTLER->CreateSound( "snd/Pickup_Coin.wav" ) )
-            .Add( BUTLER->CreateSound( "snd/Pickup_Coin2.wav" ) )
-            .Add( BUTLER->CreateSound( "snd/Pickup_Coin3.wav" ) )
-            .Add( BUTLER->CreateSound( "snd/Pickup_Coin4.wav" ) );
-
-    fuel_spr = BUTLER->CreateSprite( "fuel" );
-    fuel_spr.SetPosition( window_w - 120, window_h - 46 );
-
+    // Defaults
     can_activate_docking = false;
 
     satellite.SetPos( 480, 480 );
     box.SetPos( 500, 500 );
 
+    // Resources
+    life_spr = BUTLER->CreateSprite( "life" );
+    junk_spr = BUTLER->CreateSprite( "junk" );
+    coveted_spr = BUTLER->CreateSprite( "coveted" );
+    fuel_spr = BUTLER->CreateSprite( "fuel" );
     arrow_home_spr = BUTLER->CreateSprite( "arrowhome" );
+
+    coveted_str = junk_str = BUTLER->CreateString( "fnt/consola.ttf", 15 );
+
+    junk_snd.Add( BUTLER->CreateSound( "snd/Pickup_Coin.wav" ) )
+            .Add( BUTLER->CreateSound( "snd/Pickup_Coin2.wav" ) )
+            .Add( BUTLER->CreateSound( "snd/Pickup_Coin3.wav" ) )
+            .Add( BUTLER->CreateSound( "snd/Pickup_Coin4.wav" ) );
 
     hit_snd = BUTLER->CreateSound( "snd/Exp.wav" );
     heal_snd = BUTLER->CreateSound( "snd/heal.wav" );
@@ -145,9 +138,6 @@ void Space::Update( float dt )
 
     // Center cam on satellite
     CenterCam( satellite.GetPos() );
-
-    // Update GUI
-    junk_str.SetText( boost::lexical_cast<std::string>( satellite.JunkCollected() ) );
 }
 
 void Space::Draw()
@@ -185,8 +175,8 @@ void Space::Draw()
     }
 
     // Draw GUI elements
+    DrawCollected();
     DrawLife();
-    DrawJunk();
     DrawFuel();
 
     // Draw docking on top, if we can ofc
@@ -344,6 +334,7 @@ void Space::Intersects( ItemPtr item )
             break;
         case AddCovet:
             coveted_snd.Play();
+            satellite.ChangeCoveted( 1 );
             break;
         default: break;
     }
@@ -373,6 +364,7 @@ void Space::DrawLife()
         TWEAKS->GetNum( "life_edge" )          // outline
     );
 
+    life_spr.SetPosition( window_w - 120, window_h - 26 );
     Tree::Draw( life_spr );
 }
 
@@ -383,10 +375,26 @@ void Space::JunkAdded( int num )
     curr_junk_snd.Play();
 }
 
-void Space::DrawJunk()
+void Space::DrawCollected()
 {
+    junk_str.SetText( boost::lexical_cast<std::string>( satellite.JunkCollected() ) );
+    coveted_str.SetText( boost::lexical_cast<std::string>( satellite.CovetedCollected() ) );
+
+    const int window_h = Tree::GetWindowHeight();
+
+    junk_spr.SetPosition( 10, window_h - 30 );
     Tree::Draw( junk_spr );
+
+    junk_str.SetColor( Tree::Color( 0xffcccccc ) );
+    junk_str.SetPosition( 36, window_h - 28 );
     Tree::Draw( junk_str );
+
+    coveted_spr.SetPosition( 10, window_h - 60 );
+    Tree::Draw( coveted_spr );
+
+    coveted_str.SetColor( Tree::Color( 0xffcccccc ) );
+    coveted_str.SetPosition( 36, window_h - 58 );
+    Tree::Draw( coveted_str );
 }
 
 void Space::DrawFuel()
@@ -411,6 +419,7 @@ void Space::DrawFuel()
         TWEAKS->GetNum( "fuel_edge" )          // outline
     );
 
+    fuel_spr.SetPosition( window_w - 120, window_h - 46 );
     Tree::Draw( fuel_spr );
 }
 

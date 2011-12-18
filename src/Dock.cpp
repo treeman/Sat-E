@@ -27,7 +27,7 @@ Dock::Dock( Satellite &sat ) : satellite(sat)
     selections[Armor].junk_cost = 20;
 
     selections[Exchange].txt = "Trade";
-    selections[Exchange].junk_cost = 10;
+    selections[Exchange].coveted_cost = 1;
 
     selections[Reciever].txt = "Wow I can see where my home is :D";
     selections[Reciever].junk_cost = 40;
@@ -46,6 +46,9 @@ Dock::Dock( Satellite &sat ) : satellite(sat)
     bad_snd = BUTLER->CreateSound( "snd/bad_choice.wav" );
     select_snd = BUTLER->CreateSound( "snd/Powerup.wav" );
     move_snd = BUTLER->CreateSound( "snd/Blip_Select.wav" );
+
+    junk_spr = BUTLER->CreateSprite( "junk" );
+    coveted_spr = BUTLER->CreateSprite( "coveted" );
 }
 
 bool Dock::IsActive()
@@ -132,8 +135,27 @@ void Dock::Draw()
         }
     }
 
+    Selection &s = selections[curr_selection];
+
+    str.SetColor( Tree::Color( 0xffcccccc ) );
     str.SetText( selections[curr_selection].txt );
     str.SetPosition( 200, 250 );
+    Tree::Draw( str );
+
+    junk_spr.SetPosition( 200, 270 );
+    Tree::Draw( junk_spr );
+
+    str.SetColor( Tree::Color( 0xffcccccc ) );
+    str.SetPosition( 230, 272 );
+    str.SetText( boost::lexical_cast<std::string>( s.junk_cost ) );
+    Tree::Draw( str );
+
+    coveted_spr.SetPosition( 280, 272 );
+    Tree::Draw( coveted_spr );
+
+    str.SetColor( Tree::Color( 0xffcccccc ) );
+    str.SetPosition( 310, 272 );
+    str.SetText( boost::lexical_cast<std::string>( s.coveted_cost ) );
     Tree::Draw( str );
 }
 

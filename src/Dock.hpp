@@ -66,5 +66,8 @@ private:
 
     bool MeetsDemand( Selection &s );
     void RetractDemand( Selection &s );
+
+    sf::Sprite junk_spr;
+    sf::Sprite coveted_spr;
 };
 

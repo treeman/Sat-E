@@ -63,11 +63,15 @@ private:
     void JunkAdded( int num );
 
     sf::Sprite junk_spr;
+    sf::Sprite coveted_spr;
+
     sf::String junk_str;
+    sf::String coveted_str;
+
     Tree::ShuffleBag<sf::Sound> junk_snd;
     sf::Sound curr_junk_snd; // Workaround ^^
 
-    void DrawJunk();
+    void DrawCollected();
 
     sf::Sprite fuel_spr;
 
