@@ -34,6 +34,9 @@ refuel_speed = 50.0 -- recharge at dock
 
 asteroid_damage = 10
 
+-- distance for chunk generation
+outer_rim = 30
+
 -- upgrades
 fuel_incr = 50 -- how much to increase fuel every time we buy
 speed_incr = satellite_max_vel / 2

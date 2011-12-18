@@ -51,6 +51,10 @@ void Space::HandleEvent( sf::Event &e )
                         Teleport();
                     }
                     break;
+                case sf::Key::A:
+                    satellite.ChangeJunk( 10 );
+                    satellite.ChangeCoveted( 10 );
+                    break;
                 default: break;
             }
         }
@@ -138,6 +142,15 @@ void Space::Update( float dt )
 
     // Center cam on satellite
     CenterCam( satellite.GetPos() );
+
+    // Debug chunk
+    Chunks::iterator it = chunks.find( CurrentChunkIndex() );
+    if( it != chunks.end() ) {
+        Chunk &chunk = it->second;
+        std::stringstream ss;
+        ss << "chunk_rand: " << chunk.Rand() << '\n';
+        Tree::VisualDebug( ss.str() );
+    }
 }
 
 void Space::Draw()
@@ -278,7 +291,7 @@ void Space::AllocateChunk( Vec2i chunk_index )
     if( existing_chunks.find( chunk_index ) != existing_chunks.end() ) return;
 
     // Make a chunk!
-    Chunk chunk( ChunkRect( chunk_index ), generator );
+    Chunk chunk( ChunkRect( chunk_index ), generator, CurrentChunkIndex().Magnitude() );
 
     // Insert it
     chunks.insert( std::make_pair( chunk_index, chunk ) );

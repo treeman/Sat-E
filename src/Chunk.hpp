@@ -5,9 +5,11 @@
 
 class Chunk {
 public:
-    Chunk( sf::IntRect rect, ItemGenerator generator );
+    Chunk( sf::IntRect rect, ItemGenerator generator, int distance );
 
     Items GetItems();
+
+    float Rand() { return rand; }
 
     void Update( float dt );
     void Draw( Vec2i offset, sf::IntRect visible );
@@ -23,5 +25,7 @@ private:
 
     // Item generator
     ItemGenerator &generator;
+
+    float rand;
 };
 

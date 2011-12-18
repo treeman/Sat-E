@@ -120,7 +120,14 @@ void Dock::Draw()
         for( int y = 0; y < lines; ++y ) {
             const int xp = topleft.x + (w + x_space) * x;
             const int yp = topleft.y + (w + y_space) * y;
-            Tree::Draw( sf::Shape::Rectangle( xp, yp, xp + w, yp + h, Tree::Color( 0xffffffff ) ) );
+
+            const int index = x + y * rows;
+
+            Tree::Color col;
+            if( curr_selection == index ) { col = Tree::Color( 0xffff0000 ); }
+            else { col = Tree::Color( 0xffffffff ); }
+
+            Tree::Draw( sf::Shape::Rectangle( xp, yp, xp + w, yp + h, col ) );
 
             //const int i = x + y * rows;
             //str.SetText( selections[i].txt );
@@ -142,21 +149,24 @@ void Dock::Draw()
     str.SetPosition( 200, 250 );
     Tree::Draw( str );
 
-    junk_spr.SetPosition( 200, 270 );
-    Tree::Draw( junk_spr );
+    if( s.junk_cost > 0 ) {
+        junk_spr.SetPosition( 200, 270 );
+        Tree::Draw( junk_spr );
 
-    str.SetColor( Tree::Color( 0xffcccccc ) );
-    str.SetPosition( 230, 272 );
-    str.SetText( boost::lexical_cast<std::string>( s.junk_cost ) );
-    Tree::Draw( str );
+        str.SetColor( Tree::Color( 0xffcccccc ) );
+        str.SetPosition( 230, 272 );
+        str.SetText( boost::lexical_cast<std::string>( s.junk_cost ) );
+        Tree::Draw( str );
+    }
+    else if( s.coveted_cost > 0 ) {
+        coveted_spr.SetPosition( 200, 272 );
+        Tree::Draw( coveted_spr );
 
-    coveted_spr.SetPosition( 280, 272 );
-    Tree::Draw( coveted_spr );
-
-    str.SetColor( Tree::Color( 0xffcccccc ) );
-    str.SetPosition( 310, 272 );
-    str.SetText( boost::lexical_cast<std::string>( s.coveted_cost ) );
-    Tree::Draw( str );
+        str.SetColor( Tree::Color( 0xffcccccc ) );
+        str.SetPosition( 230, 272 );
+        str.SetText( boost::lexical_cast<std::string>( s.coveted_cost ) );
+        Tree::Draw( str );
+    }
 }
 
 // rows = 5 magic variable :)
