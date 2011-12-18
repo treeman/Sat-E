@@ -87,5 +87,7 @@ private:
     sf::Sprite arrow_home_spr;
 
     void Teleport();
+
+    sf::Sound hit_snd;
 };
 

@@ -25,11 +25,17 @@ public:
     ItemGenerator( int chunk_w, int chunk_h );
 
     ItemPtr CreateJunk( Vec2i offset = Vec2i::zero );
+    ItemPtr CreateAsteroid( Vec2i offset = Vec2i::zero );
+
     Star CreateStar( Vec2i offset = Vec2i::zero );
 private:
     Tree::ShuffleBag<sf::Sprite> junk_bag;
+    Tree::ShuffleBag<sf::Sprite> asteroid_bag;
+
     Tree::ShuffleBag<Vec2i> position_bag;
 
     const int chunk_w, chunk_h;
+
+    void Fill( Tree::ShuffleBag<sf::Sprite> &bag, std::string img, int w, int h );
 };
 

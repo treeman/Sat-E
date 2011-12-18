@@ -32,6 +32,8 @@ fuel_edge = 0xff929292
 fuel_speed = 3.0 -- how fast we're using fuel
 refuel_speed = 50.0 -- recharge at dock
 
+asteroid_damage = 10
+
 -- upgrades
 fuel_incr = 50 -- how much to increase fuel every time we buy
 speed_incr = satellite_max_vel / 2

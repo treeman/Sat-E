@@ -1,4 +1,5 @@
 #include "ItemGenerator.hpp"
+#include "Asteroid.hpp"
 
 Star::Star( Vec2i _pos, Tree::Color _color ) : pos(_pos), color(_color)
 {
@@ -28,17 +29,99 @@ ItemGenerator::ItemGenerator( int ch, int cw ) : chunk_w(cw), chunk_h(ch)
         }
     }
 
-    // Get a list of junk apperances
-    Tree::ImgPtr img = BUTLER->GetImage( "gfx/junk.png" );
+/*
+ *    // Get a list of junk apperances
+ *    Tree::ImgPtr img = BUTLER->GetImage( "gfx/junk.png" );
+ *
+ *    const int width = 20;
+ *    const int height = 20;
+ *
+ *    const int num_w = img->GetWidth() / width;
+ *    const int num_h = img->GetHeight() / height;
+ *    const int images = num_w * num_h;
+ *
+ *    //L_( "%dx%d = %d\n", img->GetWidth(), img->GetHeight(), images );
+ *
+ *    // Place all subsprites in a bag so we can generate randomly
+ *    for( int i = 0; i < images; ++i ) {
+ *        const int x_index = i % num_w;
+ *        const int y_index = i / num_w;
+ *
+ *        const int x = x_index * width;
+ *        const int y = y_index * height;
+ *
+ *        sf::Sprite spr;
+ *        spr.SetImage( *img );
+ *        spr.SetSubRect( sf::IntRect( x, y, x + width, y + height ) );
+ *        spr.SetCenter( width / 2, height / 2 );
+ *
+ *        junk_bag.Add( spr );
+ *    }
+ *
+ *    // Get a list of junk apperances
+ *    Tree::ImgPtr img = BUTLER->GetImage( "gfx/junk.png" );
+ *
+ *    const int width = 20;
+ *    const int height = 20;
+ *
+ *    const int num_w = img->GetWidth() / width;
+ *    const int num_h = img->GetHeight() / height;
+ *    const int images = num_w * num_h;
+ *
+ *    //L_( "%dx%d = %d\n", img->GetWidth(), img->GetHeight(), images );
+ *
+ *    // Place all subsprites in a bag so we can generate randomly
+ *    for( int i = 0; i < images; ++i ) {
+ *        const int x_index = i % num_w;
+ *        const int y_index = i / num_w;
+ *
+ *        const int x = x_index * width;
+ *        const int y = y_index * height;
+ *
+ *        sf::Sprite spr;
+ *        spr.SetImage( *img );
+ *        spr.SetSubRect( sf::IntRect( x, y, x + width, y + height ) );
+ *        spr.SetCenter( width / 2, height / 2 );
+ *
+ *        junk_bag.Add( spr );
+ *    }
+ */
+    Fill( junk_bag, "gfx/junk.png", 20, 20 );
+    Fill( asteroid_bag, "gfx/asteroids.png", 20, 20 );
+}
 
-    const int width = 20;
-    const int height = 20;
+ItemPtr ItemGenerator::CreateJunk( Vec2i offset )
+{
+    ItemPtr item( new Junk( junk_bag.Get() ) );
+    item->SetPos( position_bag.Get() + offset );
+    return item;
+}
+
+ItemPtr ItemGenerator::CreateAsteroid( Vec2i offset )
+{
+    ItemPtr item( new Asteroid( asteroid_bag.Get() ) );
+    item->SetPos( position_bag.Get() + offset );
+    return item;
+}
+
+Star ItemGenerator::CreateStar( Vec2i offset )
+{
+    Vec2i pos = Vec2i( math::irandom( 0, chunk_w ), math::irandom( 0, chunk_h ) );
+    pos += offset;
+
+    //star.color = Tree::Color( *math::random( star_colors.begin(), star_colors.end() ) );
+    Tree::Color color = 0xFF336699;
+
+    return Star( pos, color );
+}
+
+void ItemGenerator::Fill( Tree::ShuffleBag<sf::Sprite> &bag, std::string img_path, int width, int height )
+{
+    Tree::ImgPtr img = BUTLER->GetImage( img_path );
 
     const int num_w = img->GetWidth() / width;
     const int num_h = img->GetHeight() / height;
     const int images = num_w * num_h;
-
-    //L_( "%dx%d = %d\n", img->GetWidth(), img->GetHeight(), images );
 
     // Place all subsprites in a bag so we can generate randomly
     for( int i = 0; i < images; ++i ) {
@@ -53,25 +136,7 @@ ItemGenerator::ItemGenerator( int ch, int cw ) : chunk_w(cw), chunk_h(ch)
         spr.SetSubRect( sf::IntRect( x, y, x + width, y + height ) );
         spr.SetCenter( width / 2, height / 2 );
 
-        junk_bag.Add( spr );
+        bag.Add( spr );
     }
-}
-
-ItemPtr ItemGenerator::CreateJunk( Vec2i offset )
-{
-    ItemPtr junk( new Junk( junk_bag.Get() ) );
-    junk->SetPos( position_bag.Get() + offset );
-    return junk;
-}
-
-Star ItemGenerator::CreateStar( Vec2i offset )
-{
-    Vec2i pos = Vec2i( math::irandom( 0, chunk_w ), math::irandom( 0, chunk_h ) );
-    pos += offset;
-
-    //star.color = Tree::Color( *math::random( star_colors.begin(), star_colors.end() ) );
-    Tree::Color color = 0xFF336699;
-
-    return Star( pos, color );
 }
 

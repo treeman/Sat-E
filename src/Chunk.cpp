@@ -1,5 +1,6 @@
 #include "Chunk.hpp"
 #include "Graphics.hpp"
+#include "Asteroid.hpp"
 
 bool can_kill( ItemPtr item )
 {
@@ -27,6 +28,11 @@ Chunk::Chunk( sf::IntRect rect, ItemGenerator _generator ) :
     // Generate some junk
     for( size_t i = 0; i < 4; ++i ) {
         items.push_back( generator.CreateJunk( start_pos ) );
+    }
+
+    // Generate some asteroids
+    for( size_t i = 0; i < 6; ++i ) {
+        items.push_back( generator.CreateAsteroid( start_pos ) );
     }
 }
 
