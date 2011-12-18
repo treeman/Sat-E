@@ -1,20 +1,9 @@
 #include "Chunk.hpp"
+#include "Graphics.hpp"
 
 bool can_kill( ItemPtr item )
 {
     return item->CanKill();
-}
-
-void DrawOutline( sf::IntRect box, Vec2i offset )
-{
-    sf::Shape border = sf::Shape::Rectangle( box.Left, box.Top, box.Right, box.Bottom,
-        Tree::Color( 0xFFFFFFFF ), 1.0, Tree::Color( 0xFFFFFFFF ) );
-    border.EnableFill( false );
-    border.EnableOutline( true );
-
-    border.Move( offset );
-
-    Tree::Draw( border );
 }
 
 Chunk::Chunk( sf::IntRect rect, ItemGenerator _generator ) :
@@ -72,7 +61,7 @@ void Chunk::Draw( Vec2i offset )
     // Draw outlines
     if( SETTINGS->GetValue<bool>( "bounding_box_show" ) ) {
         for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
-            DrawOutline( (*it)->BoundingBox(), offset );
+            draw_outline( (*it)->BoundingBox(), offset );
         }
     }
 }

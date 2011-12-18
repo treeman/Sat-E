@@ -21,3 +21,14 @@ star_density = 1 / 5000;
 -- how large chunk we should generate at a time when exploring new space
 space_chunk = 1000
 
+life_col = 0xff702828
+life_background = 0xff140005
+life_edge = 0xff929292
+
+fuel_col = 0xff210029
+fuel_background = 0xff6D6DB6
+fuel_edge = 0xff929292
+
+fuel_speed = 1.0
+refuel_speed = 10.0
+

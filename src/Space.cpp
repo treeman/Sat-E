@@ -1,4 +1,5 @@
 #include "Space.hpp"
+#include "Graphics.hpp"
 
 Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "space_chunk" ) )
 {
@@ -10,6 +11,35 @@ Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "sp
     star_colors.push_back( TWEAKS->GetNum( "star_col2" ) );
     star_colors.push_back( TWEAKS->GetNum( "star_col3" ) );
     star_colors.push_back( TWEAKS->GetNum( "star_col4" ) );
+
+    const int window_w = Tree::GetWindowWidth();
+    const int window_h = Tree::GetWindowHeight();
+
+    max_life = 100;
+    max_fuel = 100;
+
+    life = 100;
+    fuel = 100;
+
+    junk_collected = 0;
+
+    life_spr = BUTLER->CreateSprite( "life" );
+    life_spr.SetPosition( window_w - 120, window_h - 26 );
+
+    junk_spr = BUTLER->CreateSprite( "junk" );
+    junk_spr.SetPosition( 10, window_h - 30 );
+
+    junk_str = BUTLER->CreateString( "fnt/consola.ttf", 15 );
+    junk_str.SetColor( Tree::Color( 0xffcccccc ) );
+    junk_str.SetPosition( 36, window_h - 28 );
+
+    junk_snd.Add( BUTLER->CreateSound( "snd/Pickup_Coin.wav" ) )
+    .Add( BUTLER->CreateSound( "snd/Pickup_Coin2.wav" ) )
+    .Add( BUTLER->CreateSound( "snd/Pickup_Coin3.wav" ) )
+    .Add( BUTLER->CreateSound( "snd/Pickup_Coin4.wav" ) );
+
+    fuel_spr = BUTLER->CreateSprite( "fuel" );
+    fuel_spr.SetPosition( window_w - 120, window_h - 46 );
 }
 
 void Space::Update( float dt )
@@ -36,6 +66,10 @@ void Space::Update( float dt )
         acc += Vec2f::down;
     }
 
+    // Retract fuel
+    fuel -= TWEAKS->GetNum( "fuel_speed" ) * dt;
+    if( fuel < 0 ) fuel = 0;
+
     // Set size
     acc.SetMagnitude( TWEAKS->GetNum( "satellite_acc" ) );
 
@@ -43,8 +77,12 @@ void Space::Update( float dt )
 
     // Check for closeness to our docking system
     const Vec2f docking = satellite.GetPos() - box.GetPos();
-    if( docking.Magnitude() <= 30 ) {
-        box.IsClose( true );
+    if( docking.Magnitude() <= 30 ) { // We're close!!
+        box.IsClose( true ); // Visible cue
+
+        // Increase our fuel
+        fuel += TWEAKS->GetNum( "refuel_speed" ) * dt;
+        if( fuel > max_fuel ) fuel = max_fuel;
     }
     else {
         box.IsClose( false );
@@ -75,6 +113,9 @@ void Space::Update( float dt )
 
     // Center cam on satellite
     CenterCam( satellite.GetPos() );
+
+    // Update GUI
+    junk_str.SetText( boost::lexical_cast<std::string>( junk_collected ) );
 }
 
 void Space::Draw()
@@ -98,25 +139,13 @@ void Space::Draw()
     satellite.Draw( offset );
 
     if( SETTINGS->GetValue<bool>( "bounding_box_show" ) ) {
-        DrawOutline( satellite.BoundingBox() );
-
-        // Draw outlines for pickups
-        //for( Items::iterator it = items.begin(); it != items.end(); ++it ) {
-            //DrawOutline( (*it)->BoundingBox() );
-        //}
+        draw_outline( satellite.BoundingBox(), -cam );
     }
-}
 
-void Space::DrawOutline( sf::IntRect box )
-{
-    sf::Shape border = sf::Shape::Rectangle( box.Left, box.Top, box.Right, box.Bottom,
-        Tree::Color( 0xFFFFFFFF ), 1.0, Tree::Color( 0xFFFFFFFF ) );
-    border.EnableFill( false );
-    border.EnableOutline( true );
-
-    border.Move( -cam );
-
-    Tree::Draw( border );
+    // Draw GUI elements
+    DrawLife();
+    DrawJunk();
+    DrawFuel();
 }
 
 void Space::UpdateSpaceChunks()
@@ -189,7 +218,7 @@ void Space::Intersects( ItemPtr item )
             L_("I'm a master of nothing!\n");
             break;
         case AddJunk:
-            L_("Getting some junk added\n");
+            JunkAdded( 1 );
             break;
         case Hurts:
             L_("Ouch!\n");
@@ -197,5 +226,68 @@ void Space::Intersects( ItemPtr item )
     }
 
     item->Kill();
+}
+
+void Space::DrawLife()
+{
+    const int window_w = Tree::GetWindowWidth();
+    const int window_h = Tree::GetWindowHeight();
+
+    const int w = 84;
+    const int h = 10;
+
+    const float perc = (float)life / (float)max_life;
+
+    const int hspace = 10;
+    const int wspace = 10;
+
+    draw_bar( sf::IntRect(
+        window_w - w - wspace, window_h - h - hspace,
+        window_w - wspace, window_h - hspace ),
+        perc,
+        TWEAKS->GetNum( "life_col" ),          // foreground
+        TWEAKS->GetNum( "life_background" ),   // background
+        TWEAKS->GetNum( "life_edge" )          // outline
+    );
+
+    Tree::Draw( life_spr );
+}
+
+void Space::JunkAdded( int num )
+{
+    junk_collected += num;
+    curr_junk_snd = junk_snd.Get();
+    curr_junk_snd.Play();
+}
+
+void Space::DrawJunk()
+{
+    Tree::Draw( junk_spr );
+    Tree::Draw( junk_str );
+}
+
+void Space::DrawFuel()
+{
+    const int window_w = Tree::GetWindowWidth();
+    const int window_h = Tree::GetWindowHeight();
+
+    const int w = 84;
+    const int h = 10;
+
+    const float perc = fuel / max_fuel;
+
+    const int hspace = 30;
+    const int wspace = 10;
+
+    draw_bar( sf::IntRect(
+        window_w - w - wspace, window_h - h - hspace,
+        window_w - wspace, window_h - hspace ),
+        perc,
+        TWEAKS->GetNum( "fuel_col" ),          // foreground
+        TWEAKS->GetNum( "fuel_background" ),   // background
+        TWEAKS->GetNum( "fuel_edge" )          // outline
+    );
+
+    Tree::Draw( fuel_spr );
 }
 

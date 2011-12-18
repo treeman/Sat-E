@@ -19,8 +19,6 @@ private:
 
     std::vector<double> star_colors;
 
-    void DrawOutline( sf::IntRect box );
-
     // Our base box ^^
     Box box;
 
@@ -48,5 +46,27 @@ private:
     ItemGenerator generator;
 
     void Intersects( ItemPtr item );
+
+    int life;
+    int max_life;
+    sf::Sprite life_spr;
+
+    void DrawLife();
+
+    void JunkAdded( int num );
+    int junk_collected;
+
+    sf::Sprite junk_spr;
+    sf::String junk_str;
+    Tree::ShuffleBag<sf::Sound> junk_snd;
+    sf::Sound curr_junk_snd; // Workaround ^^
+
+    void DrawJunk();
+
+    float fuel;
+    float max_fuel;
+    sf::Sprite fuel_spr;
+
+    void DrawFuel();
 };
 
