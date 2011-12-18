@@ -43,6 +43,7 @@ Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "sp
     arrow_home_spr = BUTLER->CreateSprite( "arrowhome" );
 
     hit_snd = BUTLER->CreateSound( "snd/Exp.wav" );
+    heal_snd = BUTLER->CreateSound( "snd/heal.wav" );
 }
 
 void Space::HandleEvent( sf::Event &e )
@@ -338,6 +339,11 @@ void Space::Intersects( ItemPtr item )
             satellite.ChangeLife( -TWEAKS->GetNum( "asteroid_damage" ) );
             hit_snd.Play();
             break;
+        case Heal:
+            satellite.ChangeLife( TWEAKS->GetNum( "asteroid_damage" ) );
+            heal_snd.Play();
+            break;
+        default: break;
     }
 
     item->Kill();

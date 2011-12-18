@@ -2,7 +2,7 @@
 
 #include "Tree.hpp"
 
-#include "Junk.hpp"
+#include "Items.hpp"
 
 class Star {
 public:
@@ -26,11 +26,14 @@ public:
 
     ItemPtr CreateJunk( Vec2i offset = Vec2i::zero );
     ItemPtr CreateAsteroid( Vec2i offset = Vec2i::zero );
+    ItemPtr CreateHealer( Vec2i offset = Vec2i::zero );
 
     Star CreateStar( Vec2i offset = Vec2i::zero );
 private:
-    Tree::ShuffleBag<sf::Sprite> junk_bag;
-    Tree::ShuffleBag<sf::Sprite> asteroid_bag;
+    typedef Tree::ShuffleBag<sf::Sprite> SprBag;
+    SprBag junk_bag;
+    SprBag asteroid_bag;
+    SprBag healer_bag;
 
     Tree::ShuffleBag<Vec2i> position_bag;
 

@@ -1,5 +1,4 @@
 #include "ItemGenerator.hpp"
-#include "Asteroid.hpp"
 
 Star::Star( Vec2i _pos, Tree::Color _color ) : pos(_pos), color(_color)
 {
@@ -29,65 +28,9 @@ ItemGenerator::ItemGenerator( int ch, int cw ) : chunk_w(cw), chunk_h(ch)
         }
     }
 
-/*
- *    // Get a list of junk apperances
- *    Tree::ImgPtr img = BUTLER->GetImage( "gfx/junk.png" );
- *
- *    const int width = 20;
- *    const int height = 20;
- *
- *    const int num_w = img->GetWidth() / width;
- *    const int num_h = img->GetHeight() / height;
- *    const int images = num_w * num_h;
- *
- *    //L_( "%dx%d = %d\n", img->GetWidth(), img->GetHeight(), images );
- *
- *    // Place all subsprites in a bag so we can generate randomly
- *    for( int i = 0; i < images; ++i ) {
- *        const int x_index = i % num_w;
- *        const int y_index = i / num_w;
- *
- *        const int x = x_index * width;
- *        const int y = y_index * height;
- *
- *        sf::Sprite spr;
- *        spr.SetImage( *img );
- *        spr.SetSubRect( sf::IntRect( x, y, x + width, y + height ) );
- *        spr.SetCenter( width / 2, height / 2 );
- *
- *        junk_bag.Add( spr );
- *    }
- *
- *    // Get a list of junk apperances
- *    Tree::ImgPtr img = BUTLER->GetImage( "gfx/junk.png" );
- *
- *    const int width = 20;
- *    const int height = 20;
- *
- *    const int num_w = img->GetWidth() / width;
- *    const int num_h = img->GetHeight() / height;
- *    const int images = num_w * num_h;
- *
- *    //L_( "%dx%d = %d\n", img->GetWidth(), img->GetHeight(), images );
- *
- *    // Place all subsprites in a bag so we can generate randomly
- *    for( int i = 0; i < images; ++i ) {
- *        const int x_index = i % num_w;
- *        const int y_index = i / num_w;
- *
- *        const int x = x_index * width;
- *        const int y = y_index * height;
- *
- *        sf::Sprite spr;
- *        spr.SetImage( *img );
- *        spr.SetSubRect( sf::IntRect( x, y, x + width, y + height ) );
- *        spr.SetCenter( width / 2, height / 2 );
- *
- *        junk_bag.Add( spr );
- *    }
- */
     Fill( junk_bag, "gfx/junk.png", 20, 20 );
     Fill( asteroid_bag, "gfx/asteroids.png", 20, 20 );
+    Fill( healer_bag, "gfx/healer.png", 20, 20 );
 }
 
 ItemPtr ItemGenerator::CreateJunk( Vec2i offset )
@@ -100,6 +43,13 @@ ItemPtr ItemGenerator::CreateJunk( Vec2i offset )
 ItemPtr ItemGenerator::CreateAsteroid( Vec2i offset )
 {
     ItemPtr item( new Asteroid( asteroid_bag.Get() ) );
+    item->SetPos( position_bag.Get() + offset );
+    return item;
+}
+
+ItemPtr ItemGenerator::CreateHealer( Vec2i offset )
+{
+    ItemPtr item( new Healer( healer_bag.Get() ) );
     item->SetPos( position_bag.Get() + offset );
     return item;
 }

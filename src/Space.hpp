@@ -3,7 +3,6 @@
 #include <boost/shared_ptr.hpp>
 
 #include "Satellite.hpp"
-#include "Junk.hpp"
 #include "Box.hpp"
 #include "Chunk.hpp"
 #include "ItemGenerator.hpp"
@@ -89,5 +88,6 @@ private:
     void Teleport();
 
     sf::Sound hit_snd;
+    sf::Sound heal_snd;
 };
 
