@@ -216,13 +216,13 @@ void Space::Update( float dt )
     }
 
     // Debug chunk
-    Chunks::iterator it = chunks.find( CurrentChunkIndex() );
-    if( it != chunks.end() ) {
-        Chunk &chunk = it->second;
-        std::stringstream ss;
-        ss << "chunk_rand: " << chunk.Rand() << '\n';
-        Tree::VisualDebug( ss.str() );
-    }
+    //Chunks::iterator it = chunks.find( CurrentChunkIndex() );
+    //if( it != chunks.end() ) {
+        //Chunk &chunk = it->second;
+        //std::stringstream ss;
+        //ss << "chunk_rand: " << chunk.Rand() << '\n';
+        //Tree::VisualDebug( ss.str() );
+    //}
 }
 
 void Space::Draw()
