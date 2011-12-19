@@ -3,7 +3,7 @@ export CC = gcc
 export CFLAGS = -Wno-unused-value -Wall -I./src -I../7days/src
 
 export LIBS = -L../7days/lib -l7days -lX11 -lGL -lXrandr -lfreetype -lsndfile -lopenal -lpthread\
- -lsfml-graphics-s -lsfml-audio -lsfml-window-s -lsfml-system-s -lboost_iostreams -llua
+ -lsfml-graphics-s -lsfml-audio -lsfml-window-s -lsfml-system-s -llua
 
 export SRCDIR = src
 SRC = $(wildcard $(SRCDIR)/*cpp)

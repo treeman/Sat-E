@@ -1,0 +1,33 @@
+Hi! Thanks for taking time to actually read this.
+
+This is my game for Ludum Dare 22 called Sat-E. It's a game about a lonely satellite in space who wants to find, or build, a friend for himself.
+
+# Gameplay
+Move around and collect junk and other items. Avoid asteroids and you must return back home before the battery runs out.
+Buy stuff with the things you collect. Your goal is to buy the friend and thus win the game!
+
+# Controlls
+Arrow Keys - Move around
+Space/Return - Execute selection
+F1 - Development console
+
+# Dependencies
+
+Linux runtime:
+    sndfile, openal
+
+Building:
+    SFML
+    boost
+    lua
+
+# Source
+game:
+    https://github.com/treeman/Sat-E
+
+7days fast prototyping framework (may change):
+    https://github.com/treeman/7days
+
+homepage:
+    http://madeoftree.net/blog
+
