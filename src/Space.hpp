@@ -19,8 +19,6 @@ public:
 private:
     Satellite satellite;
 
-    std::vector<double> star_colors;
-
     // Our base box ^^
     Box box;
 
@@ -93,5 +91,17 @@ private:
     sf::Sound hit_snd;
     sf::Sound heal_snd;
     sf::Sound coveted_snd;
+
+    // Victory stuff
+    bool victory;
+    Talk endgame_chat;
+    sf::String talk_str;
+
+    sf::Sprite friend_spr;
+
+    bool game_over;
+
+    Tree::Timer fade_timer;
+    int fade;
 };
 

@@ -37,6 +37,8 @@ private:
     SprBag healer_bag;
     SprBag coveted_bag;
 
+    Tree::ShuffleBag<double> color_bag;
+
     Tree::ShuffleBag<Vec2i> position_bag;
 
     const int chunk_w, chunk_h;

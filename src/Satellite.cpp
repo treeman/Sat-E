@@ -1,9 +1,8 @@
 #include "Satellite.hpp"
 
-Satellite::Satellite() : arrow_home(false), has_teleport(false), has_friend(false), has_beer_cap(false),
-    speed_lvl(0), has_parabol(false), junk_collected(0), coveted_collected(0)
+Satellite::Satellite()
 {
-    pos = Vec2f( 100, 100 );
+    Reset();
 
     // Sprite loading
     main_spr = BUTLER->CreateSprite( "base_satellite" );
@@ -29,13 +28,22 @@ Satellite::Satellite() : arrow_home(false), has_teleport(false), has_friend(fals
 
     // Other stuff ^^
     move_snd = BUTLER->CreateSound( "snd/burst1.wav" );
-    move_snd.SetLoop( true );
+}
+
+void Satellite::Reset()
+{
+    arrow_home = has_teleport = has_friend = has_beer_cap = has_parabol = false;
+    speed_lvl = junk_collected = coveted_collected = 0;
 
     max_vel = TWEAKS->GetNum( "satellite_max_vel" );
     fuel = max_fuel = 100;
     life = max_life = 100;
 
     boost = TWEAKS->GetNum( "satellite_acc" );
+
+    pos = Vec2f::zero;
+    vel = Vec2f::zero;
+    acc = Vec2f::zero;
 }
 
 sf::IntRect Satellite::BoundingBox()
@@ -142,12 +150,17 @@ int Satellite::CovetedCollected()
     return coveted_collected;
 }
 
+void Satellite::KillNarrative()
+{
+    narrative.Kill();
+}
+
 void Satellite::Update( float dt )
 {
     if( acc.Magnitude() > 0.5 && move_snd.GetStatus() != sf::Sound::Playing ) {
         move_snd.Play();
     }
-    else if( acc == Vec2f::zero ) {
+    else if( acc.Magnitude() < 0.5 ) {
         move_snd.Stop();
     }
 

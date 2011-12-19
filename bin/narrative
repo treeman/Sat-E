@@ -1,11 +1,29 @@
-0 3 Echo!
-1 1 ...
-1 3 echo
-2 5 echo...?
-3 3 ...
+0 3 - Echo!
+1 1 - ...
+1 3 - echo
+2 5 - echo...?
+3 3 - ...
 
-0 3 It feels like I'm being watched
+0 3 - I feel like I'm being watched
 
-0 3 Hello World!
-4 4 No response...
+0 3 - Hello World!
+4 4 - No response...
+
+0 3 - Dupidu...
+
+0 3 - Manamana!
+2 3 - Dudududu!
+1 3 - Manamana!
+2 3 - Dudududu!
+1 3 - ... Can't remember ...
+2 3 - Manamana!!!
+
+0 3 - Why can't I get a friend...?
+
+0 3 - Who took my food? Damn him!
+
+0 3 - Funny
+1 3 - There's a max velocity for me
+1 3 - but with zero friction how does that work?
+1 3 - meh, game physics.
 

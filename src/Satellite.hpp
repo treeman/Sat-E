@@ -9,6 +9,8 @@ class Satellite : public Item {
 public:
     Satellite();
 
+    void Reset();
+
     sf::IntRect BoundingBox();
 
     float MaxVel() { return max_vel; }
@@ -45,6 +47,8 @@ public:
 
     void ChangeCoveted( int mod );
     int CovetedCollected();
+
+    void KillNarrative();
 
     void Update( float dt );
     void Draw( Vec2i offset );

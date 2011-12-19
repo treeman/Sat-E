@@ -2,6 +2,7 @@
 #include "Graphics.hpp"
 
 Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "space_chunk" ) ), dock( satellite )
+    , victory(false), game_over(false)
 {
     // Settings
     SETTINGS->Register( "bounding_box_show", false );
@@ -18,6 +19,7 @@ Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "sp
 
     satellite.SetPos( 480, 480 );
     box.SetPos( 500, 500 );
+    fade = 0;
 
     // Resources
     life_spr = BUTLER->CreateSprite( "life" );
@@ -25,6 +27,7 @@ Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "sp
     coveted_spr = BUTLER->CreateSprite( "coveted" );
     fuel_spr = BUTLER->CreateSprite( "fuel" );
     arrow_home_spr = BUTLER->CreateSprite( "arrowhome" );
+    friend_spr = BUTLER->CreateSprite( "friend" );
 
     coveted_str = junk_str = BUTLER->CreateString( "fnt/consola.ttf", 15 );
 
@@ -36,6 +39,17 @@ Space::Space() : generator( TWEAKS->GetNum( "space_chunk" ), TWEAKS->GetNum( "sp
     hit_snd = BUTLER->CreateSound( "snd/Exp.wav" );
     heal_snd = BUTLER->CreateSound( "snd/heal.wav" );
     coveted_snd = BUTLER->CreateSound( "snd/coveted.wav" );
+
+    talk_str = BUTLER->CreateString( "fnt/arial.ttf", 15 );
+
+    // Endgame chat
+    endgame_chat = Talk();
+    endgame_chat.Push( " - Ehm...", 2, 3 );
+    endgame_chat.Push( " - Nice weather today!", 1, 3 );
+    endgame_chat.Push( " - ...", 1, 2 );
+    endgame_chat.Push( " - I thought so too!", 1, 3 );
+    endgame_chat.Push( " - Let's try to find this legendary Nyan Cat.", 2, 3 );
+    endgame_chat.Push( " - ...", 1, 2 );
 }
 
 void Space::HandleEvent( sf::Event &e )
@@ -63,10 +77,17 @@ void Space::HandleEvent( sf::Event &e )
 
 void Space::Update( float dt )
 {
+    if( satellite.HasFriend() ) {
+        victory = true;
+    }
+    else if( satellite.Fuel() == 0.0 || satellite.Life() == 0.0 ) {
+        game_over = true;
+    }
+
     if( dock.IsActive() ) {
         dock.Update( dt );
     }
-    else {
+    else if( !victory ) {
         satellite.Update( dt ); // prevent movement when in docking mode
 
         // Update movements for the satellite in a fluid manner
@@ -91,6 +112,55 @@ void Space::Update( float dt )
         acc.SetMagnitude( satellite.AccBoost() );
 
         satellite.Accelerate( acc );
+    }
+
+    // Check victory conditions
+    if( victory ) {
+        satellite.KillNarrative();
+
+        talk_str.SetText( endgame_chat.Get() );
+
+        //friend_spr.Rotate( 10 * dt );
+
+        // Update fading
+        if( endgame_chat.IsDone() ) {
+            fade_timer.Start(); // Doesn't affect if already started
+            //L_("ticking: %.1f\n", fade_timer.GetTime());
+
+            const float fade_time = 5.0;
+            fade = (int)( 0xff * fade_timer.GetTime() / fade_time );
+            //L_("fade: %d 255 * tick / %.1f\n", fade, fade_time);
+            if( fade > 0xff ) {
+                fade = 0xff;
+                GAME->Exit();
+            }
+        }
+    }
+    else if( game_over ) {
+        satellite.KillNarrative();
+
+        fade_timer.Start(); // Doesn't affect if already started
+
+        const float fade_time = 5.0;
+        fade = (int)( 0xff * fade_timer.GetTime() / fade_time );
+        if( fade > 0xff ) {
+            // Restart game
+            game_over = victory = false;
+            can_activate_docking = false;
+
+            satellite.Reset();
+            dock.Reset();
+
+            satellite.SetPos( 480, 480 );
+            box.SetPos( 500, 500 );
+            fade = 0;
+
+            existing_chunks.clear();
+            checked_chunks.clear();
+            chunks.clear();
+
+            return;
+        }
     }
 
     box.Update( dt );
@@ -140,8 +210,10 @@ void Space::Update( float dt )
     // Update chunks, allocate more if needed
     UpdateChunks( dt );
 
-    // Center cam on satellite
-    CenterCam( satellite.GetPos() );
+    if( !game_over ) {
+        // Center cam on satellite
+        CenterCam( satellite.GetPos() );
+    }
 
     // Debug chunk
     Chunks::iterator it = chunks.find( CurrentChunkIndex() );
@@ -192,6 +264,26 @@ void Space::Draw()
     DrawLife();
     DrawFuel();
 
+    if( victory ) {
+        Vec2i pos = satellite.GetPos() + offset;
+
+        friend_spr.SetPosition( pos.x + 15, pos.y - 10 );
+        Tree::Draw( friend_spr );
+
+        talk_str.SetPosition( pos.x + 5, pos.y - 35 );
+        talk_str.SetColor( Tree::Color( 0xffeeeeee ) );
+        Tree::Draw( talk_str );
+
+        sf::Shape black = sf::Shape::Rectangle( 0, 0, Tree::GetWindowWidth(), Tree::GetWindowHeight(),
+            sf::Color( 0, 0, 0, fade ) );
+        Tree::Draw( black );
+    }
+    else if( game_over ) {
+        sf::Shape black = sf::Shape::Rectangle( 0, 0, Tree::GetWindowWidth(), Tree::GetWindowHeight(),
+            sf::Color( 0, 0, 0, fade ) );
+        Tree::Draw( black );
+    }
+
     // Draw docking on top, if we can ofc
     if( dock.IsActive() ) { dock.Draw(); }
 }
@@ -205,7 +297,7 @@ void Space::DrawChunk( Vec2i index, Vec2i offset )
         chunk.Draw( offset, sf::IntRect( cam.x, cam.y, cam.x + Tree::GetWindowWidth(), cam.y + Tree::GetWindowHeight() ) );
     }
     else {
-        L_( "Couldn't find %d chunk for rendering" );
+        //L_( "Couldn't find %d chunk for rendering" );
     }
 }
 
@@ -280,7 +372,7 @@ void Space::UpdateChunk( Vec2i index, float dt )
         }
     }
     else {
-        L_("couldn't find %d index chunk for updating\n");
+        //L_("couldn't find %d index chunk for updating\n");
     }
 }
 
@@ -301,7 +393,7 @@ void Space::AllocateChunk( Vec2i chunk_index )
 // Where are we?
 Vec2i Space::CurrentChunkIndex()
 {
-    const Vec2i center = satellite.GetPos();
+    const Vec2i center( cam.x + Tree::GetWindowWidth() / 2, cam.y + Tree::GetWindowHeight() / 2 );
     const int chunk_size = TWEAKS->GetNum( "space_chunk" );
     Vec2i chunk( center.x / chunk_size, center.y / chunk_size );
 

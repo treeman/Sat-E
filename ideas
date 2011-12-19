@@ -24,34 +24,37 @@ DONE * Endless space
     Supernovas
     Comets
     Hidden cat comet :o
-* Need to pay for upgrades
-* Need to handle victory/game over
+DONE * Need to pay for upgrades
+DONE * Need to handle victory/game over
 DONE * Upgrades should be reflected on satellite
-* Need more expensive stuff to find and collect
-* More/better further away
+DONE * Need more expensive stuff to find and collect
+DONE * More/better further away
     Tweak chunk types or something?
 * Need to tweak numbers and shit
 * Background music
-* Graphics for docking choices
+DONE * Graphics for docking choices
 DONE * Pickup health
 
 # Big TODO
-* Different characteristic for different chunks
-* Victory and End
+DONE * Different characteristic for different chunks
+DONE * Victory and End
 DONE * Additional item to collect apart from junk
-* Better visuals on docking
+DONE * Better visuals on docking
 * Background music (?)
+    No time!
 * Nicer graphics
+    Awwww yeah...!
 
 THEN
 
 * Fine tuning
+    No time!
 
 # Gameplay
-* Collect different stuff
-* Venture deeper into space to find stuff, but not too far or you'll run out of fuel!!
-* Better stuff further away
-* Deposit finds on docking station and get upgrades in return
+DONE * Collect different stuff
+DONE * Venture deeper into space to find stuff, but not too far or you'll run out of fuel!!
+DONE * Better stuff further away
+DONE * Deposit finds on docking station and get upgrades in return
     DONE Speed
     DONE Acceleration
     DONE Teleport

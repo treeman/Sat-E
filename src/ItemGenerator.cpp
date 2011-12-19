@@ -28,6 +28,11 @@ ItemGenerator::ItemGenerator( int ch, int cw ) : chunk_w(cw), chunk_h(ch)
         }
     }
 
+    color_bag.Add( TWEAKS->GetNum( "star_col1" ) );
+    color_bag.Add( TWEAKS->GetNum( "star_col2" ) );
+    color_bag.Add( TWEAKS->GetNum( "star_col3" ) );
+    color_bag.Add( TWEAKS->GetNum( "star_col4" ) );
+
     Fill( junk_bag, "gfx/junk.png", 20, 20 );
     Fill( asteroid_bag, "gfx/asteroids.png", 20, 20 );
     Fill( healer_bag, "gfx/healer.png", 20, 20 );
@@ -67,10 +72,7 @@ Star ItemGenerator::CreateStar( Vec2i offset )
     Vec2i pos = Vec2i( math::irandom( 0, chunk_w ), math::irandom( 0, chunk_h ) );
     pos += offset;
 
-    //star.color = Tree::Color( *math::random( star_colors.begin(), star_colors.end() ) );
-    Tree::Color color = 0xFF336699;
-
-    return Star( pos, color );
+    return Star( pos, color_bag.Get() );
 }
 
 void ItemGenerator::Fill( Tree::ShuffleBag<sf::Sprite> &bag, std::string img_path, int width, int height )

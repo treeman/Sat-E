@@ -5,6 +5,18 @@ Dock::Dock( Satellite &sat ) : satellite(sat)
     str = BUTLER->CreateString( "fnt/consola.ttf", 15 );
     str.SetColor( Tree::Color( 0xff00ff00 ) );
 
+    Reset();
+
+    bad_snd = BUTLER->CreateSound( "snd/bad_choice.wav" );
+    select_snd = BUTLER->CreateSound( "snd/Powerup.wav" );
+    move_snd = BUTLER->CreateSound( "snd/Blip_Select.wav" );
+
+    junk_spr = BUTLER->CreateSprite( "junk" );
+    coveted_spr = BUTLER->CreateSprite( "coveted" );
+}
+
+void Dock::Reset()
+{
     Deactivate();
 
     // Init selections in a slightly ugly way ^^
@@ -14,41 +26,44 @@ Dock::Dock( Satellite &sat ) : satellite(sat)
         selections.push_back( selection );
     }
 
-    selections[Battery].txt = "I can go further!";
+    selections[Battery].txt = "Some more batteries so I can explore more.";
     selections[Battery].junk_cost = 2;
+    selections[Battery].spr = BUTLER->CreateSprite( "battery" );
 
     selections[Acceleration].txt = "Better handling, better controll.";
     selections[Acceleration].junk_cost = 20;
+    selections[Acceleration].spr = BUTLER->CreateSprite( "acc" );
 
-    selections[Speed].txt = "I want to go faster!";
+    selections[Speed].txt = "Rockets! Shoot me forward!";
     selections[Speed].junk_cost = 20;
+    selections[Speed].spr = BUTLER->CreateSprite( "rocket" );
 
-    selections[Armor].txt = "Mmmh... I'm strong!";
+    selections[Armor].txt = "Mmmh... Will this make me hard and cool?";
     selections[Armor].junk_cost = 20;
+    selections[Armor].spr = BUTLER->CreateSprite( "armor" );
 
-    selections[Exchange].txt = "Trade";
+    selections[Exchange].txt = "Trade good for bad? I'm a hard negotiator...";
     selections[Exchange].coveted_cost = 1;
+    selections[Exchange].spr = BUTLER->CreateSprite( "exchange" );
 
-    selections[Reciever].txt = "Wow I can see where my home is :D";
+    selections[Reciever].txt = "Is this a GPS? Or a radar? How does that work?";
     selections[Reciever].junk_cost = 40;
+    selections[Reciever].spr = BUTLER->CreateSprite( "phonehome" );
 
-    selections[Teleport].txt = "Maybe like StarTrek? Or I could end up dead?";
+    selections[Teleport].txt = "Beam me in Scotty! Where's Scotty anyway?";
     selections[Teleport].junk_cost = 50;
+    selections[Teleport].spr = BUTLER->CreateSprite( "teleporter" );
 
     selections[CokeHat].txt = "'Beer-On-A-Cap'. Oh My God!!";
     selections[CokeHat].coveted_cost = 20;
+    selections[CokeHat].spr = BUTLER->CreateSprite( "beercap" );
 
-    selections[Friend].txt = "Construct me a Friend. Not that I'm lonely.";
+    selections[Friend].txt = "Make a friend. Not that I'm lonely.";
     selections[Friend].coveted_cost = 100;
+    selections[Friend].spr = BUTLER->CreateSprite( "friendz" );
 
     selections[Exit].txt = "Go away from docking.";
-
-    bad_snd = BUTLER->CreateSound( "snd/bad_choice.wav" );
-    select_snd = BUTLER->CreateSound( "snd/Powerup.wav" );
-    move_snd = BUTLER->CreateSound( "snd/Blip_Select.wav" );
-
-    junk_spr = BUTLER->CreateSprite( "junk" );
-    coveted_spr = BUTLER->CreateSprite( "coveted" );
+    selections[Exit].spr = BUTLER->CreateSprite( "exit" );
 }
 
 bool Dock::IsActive()
@@ -124,21 +139,23 @@ void Dock::Draw()
             const int index = x + y * rows;
 
             Tree::Color col;
-            if( curr_selection == index ) { col = Tree::Color( 0xffff0000 ); }
-            else { col = Tree::Color( 0xffffffff ); }
+            if( curr_selection == index ) { col = Tree::Color( 0xff4F0202 ); }
+            else { col = Tree::Color( 0xff242424 ); }
 
-            Tree::Draw( sf::Shape::Rectangle( xp, yp, xp + w, yp + h, col ) );
+            Tree::Draw( sf::Shape::Rectangle( xp, yp, xp + w, yp + h, Tree::Color( 0xff454545 ), 3.0, col ) );
 
-            //const int i = x + y * rows;
-            //str.SetText( selections[i].txt );
-            //str.SetPosition( xp, yp );
-            //if( i == curr_selection ) {
-                //str.SetColor( Tree::Color( 0xffff0000 ) );
-            //}
-            //else {
-                //str.SetColor( Tree::Color( 0xff00ff00 ) );
-            //}
-            //Tree::Draw( str );
+            Selection &s = selections[index];
+            s.spr.SetPosition( xp, yp );
+            if( index != curr_selection ) {
+                s.spr.SetColor( Tree::Color( 0xff666666 ) );
+            }
+            else if( !s.available ) {
+                s.spr.SetColor( Tree::Color( 0xff333333 ) );
+            }
+            else {
+                s.spr.SetColor( Tree::Color( 0xffffffff ) );
+            }
+            Tree::Draw( s.spr );
         }
     }
 
@@ -238,6 +255,7 @@ void Dock::Execute()
                 case Friend:
                     satellite.AddFriend();
                     s.available = false;
+                    Deactivate();
                     break;
                 case CokeHat:
                     satellite.AddBeerCap();

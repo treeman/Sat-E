@@ -27,11 +27,15 @@ struct Selection {
     std::string txt;
     int junk_cost;
     int coveted_cost;
+
+    sf::Sprite spr;
 };
 
 class Dock {
 public:
     Dock( Satellite &satellite );
+
+    void Reset();
 
     bool IsActive();
     void Activate();
@@ -69,5 +73,7 @@ private:
 
     sf::Sprite junk_spr;
     sf::Sprite coveted_spr;
+
+    sf::Sprite battery_spr;
 };
 

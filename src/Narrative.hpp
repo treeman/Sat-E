@@ -42,6 +42,8 @@ public:
 
     void SetPos( Vec2i pos );
 
+    void Kill() { t.Stop(); }
+
     void Draw();
 private:
     Vec2i pos;
